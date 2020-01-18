@@ -2,6 +2,8 @@
 
 A local PageStudio development server in Node.js. 
 
+![Alt text](screenshot.jpg?raw=true "PageStudio Node Development Server")
+
 This tool lets PageStudio developers build templates locally by running a node.js proxy server to interface with an active PageStudio site. It watches your template and recompiles when changes are made.
 
 ## Installation
