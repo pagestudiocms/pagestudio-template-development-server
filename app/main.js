@@ -9,12 +9,19 @@ var run = function () {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      var content = xhttp.responseText;
       let iframe = document.getElementById('viewport');
-      replaceIframeContent(iframe, content);
+      var response = xhttp.responseText;
+      var content = JSON.parse(response);
+
+      setTimeout(()=>{
+        console.log(content);
+        replaceIframeContent(iframe, content.html);
+        // iframe.src = content.url;
+      }, 200);
+
     }
   };
-  xhttp.open("GET", "/json", true);
+  xhttp.open("GET", "/data", true);
   xhttp.send();
 }; 
 

@@ -27,6 +27,20 @@
             font-size: 13px;
             color: #959595;
         }
+        .responsive-iframe {
+            position: relative;
+            padding-bottom: 56.25%;
+            /*16:9*/
+            height: 0;
+            overflow: hidden;
+        }
+        .responsive-iframe iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -34,7 +48,9 @@
     <main id="main" role="main">
         <h1>Welcome to the PageStudio development server</h1>
 
-        <iframe id="viewport" src="" frameborder="0" allowfullscreen=""></iframe>
+        <div class="responsive-iframe">
+            <iframe id="viewport" src="" frameborder="0" allowfullscreen=""></iframe>
+        </div>
     </main> 
 
     <script src="./main.js"></script>
