@@ -30,5 +30,8 @@
   "bin": {
     "start-server": "./bin/server.js"
   },
-  "keywords": []
+  "keywords": [], 
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@pagestudiocms"
+  }
 }
