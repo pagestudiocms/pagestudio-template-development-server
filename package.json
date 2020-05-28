@@ -1,5 +1,5 @@
 {
-  "name": "pagestudio-nodejs-server",
+  "name": "pagestudio-node-development-server",
   "version": "1.0.0",
   "description": "PageStudio Node.js Server",
   "main": "server.js",
