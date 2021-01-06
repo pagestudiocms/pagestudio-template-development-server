@@ -1,6 +1,6 @@
 # PageStudio Node Development Server
 
-The NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.
+This NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.
 
 ![Alt text](screenshot.jpg?raw=true "PageStudio Node Development Server")
 

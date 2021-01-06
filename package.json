@@ -1,12 +1,12 @@
 {
-  "name": "pagestudio-node-development-server",
+  "name": "@pagestudiocms/pagestudio-node-development-server",
   "version": "1.0.1",
-  "description": "The NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.",
+  "description": "This NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.",
   "keywords": [],
   "license": "MIT",
   "author": "PageStudio Dev Team",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@pagestudiocms"
+    "registry": "https://npm.pkg.github.com/"
   },
   "main": "server.js",
   "dependencies": {
