@@ -28,6 +28,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "postinstall": "node postinstall.js",
     "start-server": "node ./server.js",
     "sass:build": "node-sass --output-style compressed src/scss/style.scss -o build/assets/css --source-map true",
     "sass:watch": "node-sass src/scss/style.scss -wo build/assets/css --source-map true",
