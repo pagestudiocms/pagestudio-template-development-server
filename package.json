@@ -1,7 +1,13 @@
 {
-  "name": "pagestudio-template-development-server",
-  "version": "1.0.0",
+  "name": "pagestudio-node-development-server",
+  "version": "1.0.1",
   "description": "The NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.",
+  "keywords": [],
+  "license": "MIT",
+  "author": "PageStudio Dev Team",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@pagestudiocms"
+  },
   "main": "server.js",
   "dependencies": {
     "node-sass": "^4.14.1",
@@ -31,12 +37,5 @@
     "build": "run-s build:*",
     "watch:css": "onchange \"src/scss\" -- run-s build:css",
     "watch": "run-p start-server sass:*"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://cosmointeractive@bitbucket.org/pagestudiocms/pagestudio-template.git"
-  },
-  "author": "Cosmo Mathieu",
-  "license": "MIT",
-  "homepage": "https://bitbucket.org/pagestudiocms/pagestudio-template#readme"
+  }
 }
