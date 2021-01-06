@@ -1,34 +1,42 @@
 {
-  "name": "pagestudio-nodejs-server",
+  "name": "pagestudio-template-development-server",
   "version": "1.0.0",
-  "description": "PageStudio Node.js Server",
+  "description": "The NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.",
   "main": "server.js",
-  "scripts": {
-    "install-server": "npm install",
-    "start-server": "node ./bin/server.js"
-  },
-  "author": "PageStudio Dev Team",
-  "license": "ISC",
   "dependencies": {
+    "node-sass": "^4.14.1",
+    "rollup": "1.30.1",
     "chalk": "^2.4.2",
     "clear": "^0.1.0",
     "figlet": "^1.2.4",
     "live-server": "~1.2.1",
     "express": "~4.17.1",
-    "exec-php": "0.0.5",
     "body-parser": "~1.9",
     "cookie": "~0.1",
     "forever": "~0.11",
     "fs-extra": "~0.12",
     "open": "0.0.5",
     "request": "~2",
-    "slug": "~0.7"
+    "slug": "~0.7",
+    "npm-run-all": "^2.1.1"
   },
-  "directories": {
-    "bin": "./bin"
+  "devDependencies": {},
+  "scripts": {
+    "start-server": "node ./server.js",
+    "sass:build": "node-sass --output-style compressed src/scss/style.scss -o build/assets/css --source-map true",
+    "sass:watch": "node-sass src/scss/style.scss -wo build/assets/css --source-map true",
+    "build:css": "run-s lint-scss scss autoprefixer",
+    "build:js": "run-s lint uglify",
+    "build:images": "run-s imagemin icons",
+    "build": "run-s build:*",
+    "watch:css": "onchange \"src/scss\" -- run-s build:css",
+    "watch": "run-p start-server sass:*"
   },
-  "bin": {
-    "start-server": "./bin/server.js"
+  "repository": {
+    "type": "git",
+    "url": "git+https://cosmointeractive@bitbucket.org/pagestudiocms/pagestudio-template.git"
   },
-  "keywords": []
+  "author": "Cosmo Mathieu",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/pagestudiocms/pagestudio-template#readme"
 }

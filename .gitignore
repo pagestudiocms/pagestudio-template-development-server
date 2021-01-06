@@ -1,9 +1,8 @@
-.cache/*
-!.cache/.gitkeep
+build/*
+!build/.gitkeep
+demo/*
+!demo/.gitkeep
 node_modules/*
 !node_modules/.gitkeep
-template/*
-!template/.gitkeep
-var/*
-!var/cache/.gitkeep
-!var/log/.gitkeep
+src/*
+!src/.gitkeep
