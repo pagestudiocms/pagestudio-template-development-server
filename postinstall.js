@@ -11,10 +11,13 @@ if (!json.hasOwnProperty('scripts')) {
   json.scripts = {};
 }
 
-json.dependencies['npm-run-all'] = "^4.1.5";
-json.scripts['sass:build'] = "node-sass --output-style compressed src/scss/style.scss -o build/assets/css --source-map true";
-json.scripts['sass:watch'] = "node-sass src/scss/style.scss -wo build/assets/css --source-map true";
-json.scripts['start'] = "npm-run-all --parallel sass:watch start-server",
-json.scripts['start-server'] = "node ./node_modules/@pagestudiocms/pagestudio-template-development-server/server.js";
+json.dependencies["npm-run-all"] = "^4.1.5";
+json.dependencies["html-includes"] = "4.4.1";
+json.dependencies["node-sass"] = "^4.14.1";
+json.scripts["html-compile"] = "html-includes --src src/html --dest demo --watch",
+json.scripts["sass:build"] = "node-sass --output-style compressed src/scss/style.scss -o build/assets/css --source-map true";
+json.scripts["sass:watch"] = "node-sass src/scss/style.scss -wo build/assets/css --source-map true";
+json.scripts["start"] = "npm-run-all --parallel sass:watch html-compile start-server",
+json.scripts["start-server"] = "node ./node_modules/@pagestudiocms/pagestudio-template-development-server/server.js";
 
 saveFile(pkgJsonPath, JSON.stringify(json, null, 2));
