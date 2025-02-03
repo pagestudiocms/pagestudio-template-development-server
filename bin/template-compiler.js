@@ -68,17 +68,16 @@ const compileFile = (filePath, args, partials) => {
   console.log(`Processed and saved: ${distFilePathWithoutLayouts}`);
 };
 
-// Process the template with variables and partials
 const processTemplate = (layoutContent, context, partials) => {
   let parsedContent = layoutContent;
-  // let partialRegex = /{{\s*template:partial\s+name="(\w+)"\s*}}/g;
   let partialRegex = /{{\s*template:partial\s+name="([\w-]+)"\s*}}/g;
 
   // Process partials first
   parsedContent = parsedContent.replace(partialRegex, (match, partialName) => {
     // console.log(`Processing partial: ${partialName}`);
     if (partials[partialName]) {
-      return partials[partialName];
+      // Process the partial content recursively in case it contains more partials
+      return processTemplate(partials[partialName], context, partials);
     } else {
       console.error(`Partial "${partialName}" not found.`);
       return ''; // If partial is not found, replace with nothing
@@ -96,6 +95,7 @@ const processTemplate = (layoutContent, context, partials) => {
     return content || typeof data[callbackName] !== 'undefined' ? data[callbackName] : '';
   }
 
+  // After processing the partials, parse the content with the provided context and callbacks
   parsedContent = parser.parse(parsedContent, context, parserCallbackLoader);
 
   return parsedContent;
