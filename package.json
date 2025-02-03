@@ -1,6 +1,6 @@
 {
   "name": "@pagestudiocms/pagestudio-template-development-server",
-  "version": "2.0.0-beta1",
+  "version": "2.0.0-beta2",
   "description": "This NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.",
   "keywords": [],
   "license": "MIT",
@@ -36,6 +36,6 @@
   },
   "scripts": {
     "start-server": "node server.js",
-    "watch-html": "node --trace-warnings bin/template-compiler.js --src src/html --dest dist --data-src src/html/data --partials src/html/partials"
+    "watch-html": "node --trace-warnings bin/template-compiler.js --src src/html --dest dist --data-src src/html/data --partials src/html/partials",
   }
 }
