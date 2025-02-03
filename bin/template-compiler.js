@@ -16,7 +16,7 @@ const options = [
   { name: "src", alias: "s", type: String, defaultValue: "src" },
   { name: "dest", alias: "d", type: String, defaultValue: "dist" },
   { name: "partials", alias: "p", type: String, defaultValue: "src/partials" },
-  { name: "dataDir", alias: "a", type: String, defaultValue: "src/html/data" }, // Directory for data.json files
+  { name: "data-src", alias: "a", type: String, defaultValue: "src/html/data" }, // Directory for data.json files
 ];
 const args = commandLineArgs(options);
 
@@ -39,7 +39,7 @@ const loadPartials = (partialsDir) => {
 const compileFile = (filePath, args, partials) => {
   let layoutContent = fs.readFileSync(filePath, 'utf-8');
   const layoutName = path.basename(filePath, '.html');
-  const dataFilePath = path.join(args.dataDir, `${layoutName}.data.json`);
+  const dataFilePath = path.join(args['data-src'], `${layoutName}.data.json`);
 
   // Load the context for the current layout if available
   let context = {};
@@ -71,11 +71,13 @@ const compileFile = (filePath, args, partials) => {
 // Process the template with variables and partials
 const processTemplate = (layoutContent, context, partials) => {
   let parsedContent = layoutContent;
+  // let partialRegex = /{{\s*template:partial\s+name="(\w+)"\s*}}/g;
+  let partialRegex = /{{\s*template:partial\s+name="([\w-]+)"\s*}}/g;
 
   // Process partials first
-  parsedContent = parsedContent.replace(/{{\s*template:partial\s+name="(\w+)"\s*}}/g, (match, partialName) => {
+  parsedContent = parsedContent.replace(partialRegex, (match, partialName) => {
+    // console.log(`Processing partial: ${partialName}`);
     if (partials[partialName]) {
-      // console.log(partials[partialName])
       return partials[partialName];
     } else {
       console.error(`Partial "${partialName}" not found.`);
@@ -129,7 +131,6 @@ const compile = () => {
   registerCallbacks();
 
   const partials = loadPartials(args.partials); // Load partial templates
-  const partialsPath = args.partials;
 
   // Initially process all the layout files in the src directory
   glob(path.join(args.src, 'layouts', '**/*.html'), (err, files) => {

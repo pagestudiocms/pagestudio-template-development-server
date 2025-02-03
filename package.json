@@ -10,7 +10,7 @@
   },
   "main": "server.js",
   "bin": {
-    "template-development-server": "./server.js"
+    "pagestudio-server": "./server.js"
   },
   "dependencies": {
     "chalk": "^4.1.2",
@@ -37,7 +37,7 @@
     "grunt:build": "grunt webpack",
     "grunt:watch": "grunt watch",
     "start-server": "node server.js",
-    "template-parser": "node --trace-warnings bin/compile.js --src src/html --dest dist --dataDir src/html/data --partials src/html/partials",
-    "start": "npm-run-all --parallel grunt:watch template-parser start-server"
+    "watch-html": "node --trace-warnings bin/template-compiler.js --src src/html --dest dist --data-src src/html/data --partials src/html/partials",
+    "start": "npm-run-all --parallel grunt:watch watch-html start-server"
   }
 }
