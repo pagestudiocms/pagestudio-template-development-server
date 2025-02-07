@@ -4,7 +4,7 @@ const fse = require('fs-extra');
 const glob = require('glob');
 const chokidar = require('chokidar');
 const commandLineArgs = require('command-line-args');
-const LexParser = require('../lib/lexParser');
+const { LexParser } = require('../lib/lexParser');
 
 const parser = new LexParser();
 

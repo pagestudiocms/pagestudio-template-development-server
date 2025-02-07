@@ -18,7 +18,7 @@ const args = require('command-line-args');
 // Setup defaults and options
 
 const meta = {
-  VERSION: '2.0.0-beta1',
+  VERSION: '2.0.0-beta3',
   PUBLISHER: 'PageStudioCMS',
   YEAR: '2025',
 }

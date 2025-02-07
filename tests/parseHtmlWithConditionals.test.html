@@ -1,0 +1,13 @@
+<h1>Hello {{if user}} {{user}} {{endif}}</h1>
+
+{{ if site.title == 'templates' }}
+    <h1>Foo Exists</h1>
+{{ else }}
+    <h1>Foo Does Not Exist</h1>
+{{ endif }}
+
+{{ if 'templates' == site.title }}
+    <h1>Foo Exists</h1>
+{{ else }}
+    <h1>Foo Does Not Exist</h1>
+{{ endif }}
