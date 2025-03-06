@@ -35,7 +35,10 @@
     "webpack": "^5.97.1"
   },
   "scripts": {
+    "grunt:build": "grunt webpack",
+    "grunt:watch": "grunt watch",
     "start-server": "node server.js",
-    "watch-html": "node --trace-warnings bin/template-compiler.js --src src/html --dest dist --data-src src/html/data --partials src/html/partials"
+    "watch-html": "node --trace-warnings bin/template-compiler.js --src src/html --dest compiled --data-src src/html/data --partials src/html/partials",
+    "start": "npm-run-all --parallel grunt:watch watch-html start-server"
   }
 }

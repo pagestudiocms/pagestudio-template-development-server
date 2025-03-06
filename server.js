@@ -11,7 +11,7 @@
 const chalk = require('chalk');
 const figlet = require('figlet');
 const liveServer = require("live-server");
-const fs = require('fs'); // Added fs to check if 'dist' exists
+const fs = require('fs'); // Added fs to check if 'compiled' exists
 const path = require("path"); 
 const args = require('command-line-args');
 
@@ -29,9 +29,9 @@ const binpath = path.join(abspath, 'bin/');
 const libpath = path.join(abspath, 'lib/');
 
 const optionDefinitions = [
-  { name: 'watch', alias: 'w', type: String, defaultValue: 'dist,src/html' },
+  { name: 'watch', alias: 'w', type: String, defaultValue: 'compiled,src/html' },
   { name: 'host', alias: 'h', type: String, defaultValue: '127.0.0.1' },
-  { name: 'root', alias: 'r', type: String, defaultValue: 'dist' },
+  { name: 'root', alias: 'r', type: String, defaultValue: 'compiled' },
   { name: 'port', alias: 'p', type: String, defaultValue: '8080' },
 ];
 const options = args(optionDefinitions);
@@ -57,7 +57,7 @@ const liveServerParams = {
   // file: 'default.html',    // When set, serve this file (server root relative) for every 404 (useful for single-page applications)
   wait: 2000,               // Waits for all changes, before reloading. Defaults to 0 sec.
   mount: [
-    ['/assets', './dist/assets'],
+    ['/assets', './compiled/assets'],
     ['/images', './demo/images'],
   ],                        // Mount a directory to a route.
   logLevel: 2,              // 0 = errors only, 1 = some, 2 = lots
@@ -67,11 +67,11 @@ const liveServerParams = {
     "Expires": "0",
   },
   middleware: [],           // An array of Connect-compatible middleware
-  watch: watchDirectories,  // Paths to exclusively watch for changes. Defaults to dist,src/html
+  watch: watchDirectories,  // Paths to exclusively watch for changes. Defaults to compiled,src/html
 };
 
 const preflightChecks = () => {
-  // Check if the dist folder exists
+  // Check if the compiled folder exists
   if (!fs.existsSync(webroot)) {
     throw new Error(`Invalid value for option '--webroot'. The specified path "${webroot}" does not exist.`);
   }

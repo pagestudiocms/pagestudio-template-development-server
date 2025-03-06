@@ -10,7 +10,7 @@ module.exports = {
     style: "./src/scss/style.scss"
   },
   output: {
-    path: path.resolve(__dirname, 'dist/assets/'),
+    path: path.resolve(__dirname, 'compiled/assets/'),
     filename: 'js/[name].js'
   },
   target: ['web', 'es6'],

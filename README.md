@@ -74,7 +74,7 @@ Here’s an overview of the project’s directory structure:
 ```
 project/
 ├── node_modules/            # Installed npm packages
-├── dist/                    # Output directory (compiled templates, assets)
+├── build/                   # Output directory (compiled templates, assets)
 │   ├── assets/
 │   │   ├── css/             # Compiled CSS files
 │   │   └── js/              # Bundled JS files

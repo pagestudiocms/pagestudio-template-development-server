@@ -1,5 +1,7 @@
+archived
 build/*
 !build/.gitkeep
+dist
 demo/*
 !demo/.gitkeep
 node_modules/*

@@ -2,9 +2,8 @@ const path = require('path');
 const fs = require('fs');
 const { utils } = require('../lib/utils');
 
-var templateConfig = null,
-  serverConfig = null,
-  templateConfigPath = path.join(process.cwd(), 'src', 'template.conf');
+let templateConfig = null,
+    templateConfigPath = path.join(process.cwd(), 'src', 'template.conf');
 
 function generateLinkTags(templateConfig, needle = 'undefined') {
   let links = '';
@@ -17,7 +16,7 @@ function generateLinkTags(templateConfig, needle = 'undefined') {
         if (!href.startsWith('http://') && !href.startsWith('https://')) {
           href = `assets/${href}`;
         }
-        links += `<link rel="stylesheet" href="${href}">\n`;
+        links += `<script src="${href}"></script>\n`;
       }
     }
   }
@@ -29,22 +28,17 @@ if (fs.existsSync(templateConfigPath)) {
 }
 
 module.exports = (params, context, innerContent, data = {}, parser) => {
-  const stylesheetLinks = generateLinkTags(templateConfig, 'stylesheets');
-  const webfontLinks = generateLinkTags(templateConfig, 'webfonts');
+  const javascriptLinks = generateLinkTags(templateConfig, 'javascripts');
 
   const template = `
-    <title>{{ site.title }}</title>
-    <meta name="author" content="{{ site.author }}">
-    <meta name="description" content="{{ site.description }}">
-    <meta name="keywords" content="{{ site.keywords }}">
+    <!-- CMS JavaScript Links -->
+    <script src="https://cdn.pagestudiocms.com/assets/vendors/jquery/jquery-2.1.4.min.js"></script>
+    <script src="https://cdn.pagestudiocms.com/assets/vendors/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.pagestudiocms.com/assets/vendors/wow/1.1.0/dist/wow.min.js"></script>
+    <script src="https://cdn.pagestudiocms.com/assets/vendors/jquery-validate/1.17.0/jquery.validate.min.js"></script>
 
-    <!-- Custom Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    ${webfontLinks}
-
-    <!-- Theme CSS -->
-    ${stylesheetLinks}
+    <!-- Theme JavaScript Links -->
+    ${javascriptLinks}
 
     ${innerContent.trim()}
   `;

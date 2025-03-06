@@ -14,7 +14,7 @@ const { registerCallbacks, getCallback } = require('../callbacks/register');
 // Define CLI argument options
 const options = [
   { name: "src", alias: "s", type: String, defaultValue: "src" },
-  { name: "dest", alias: "d", type: String, defaultValue: "dist" },
+  { name: "dest", alias: "d", type: String, defaultValue: "compiled" },
   { name: "partials", alias: "p", type: String, defaultValue: "src/partials" },
   { name: "data-src", alias: "a", type: String, defaultValue: "src/html/data" }, // Directory for data.json files
 ];
@@ -53,17 +53,17 @@ const compileFile = (filePath, args, partials) => {
   // Process the template content
   layoutContent = processTemplate(layoutContent, context, partials);
 
-  // Define the output path for the compiled layout in the dist folder
+  // Define the output path for the compiled layout in the compiled folder
   const relativeFilePath = path.relative(args.src, filePath); // Remove the "src" folder part
   const distFilePath = path.join(args.dest, relativeFilePath);
 
-  // Remove 'layouts' from the file path (we don't want the "layouts" folder in dist)
+  // Remove 'layouts' from the file path (we don't want the "layouts" folder in compiled)
   const distFilePathWithoutLayouts = distFilePath.replace(/layouts\//, '');
 
-  // Create the necessary directories in the dist folder
+  // Create the necessary directories in the compiled folder
   fse.ensureDirSync(path.dirname(distFilePathWithoutLayouts));
 
-  // Save the processed layout file to the dist directory
+  // Save the processed layout file to the compiled directory
   fse.outputFileSync(distFilePathWithoutLayouts, layoutContent);
   console.log(`Processed and saved: ${distFilePathWithoutLayouts}`);
 };
@@ -84,21 +84,39 @@ const processTemplate = (layoutContent, context, partials) => {
     }
   });
 
-  function parserCallbackLoader(callbackName, parameters, content, data) {
-    if (parameters) {
-      const callback = getCallback(callbackName);
-      if (callback) {
-        return callback(callbackName, parameters, content, data);
-      }
-    }
+  let specialtyTagRegex = /<([a-z]+):([a-z]+)([^>]*)\/>/g;
+  parsedContent = parsedContent.replace(specialtyTagRegex, (match, tagName, tagType, attributes) => {
+    return `{{ ${tagName}:${tagType} ${attributes.trim()} }}`;
+  });
 
-    return content || typeof data[callbackName] !== 'undefined' ? data[callbackName] : '';
-  }
-
+  const data = {
+    globalSetting: "some global value"
+  };
+  
   // After processing the partials, parse the content with the provided context and callbacks
-  parsedContent = parser.parse(parsedContent, context, parserCallbackLoader);
+  parsedContent = parser.parse(parsedContent, context, data);
 
   return parsedContent;
+};
+
+const registerParserCallbacks = () => {
+  const callbacksDir = path.join(__dirname, '/../callbacks/');
+  const files = fs.readdirSync(callbacksDir);
+
+  files.forEach(file => {
+    if(file !== 'register.js') {
+      const callbackName = path.basename(file, '.js');
+      const callback = require(path.join(callbacksDir, file));
+      
+      // Assuming each callback needs to be passed the parser instance
+      const wrappedCallback = (params, context, innerContent, data) => {
+        return callback(params, context, innerContent, data, parser);
+      };
+      parser.registerFunction(callbackName, wrappedCallback);
+    }
+  });
+
+  console.log('Callbacks registered:', Object.keys(parser.callbacks));
 };
 
 // Watch the source directory for changes
@@ -127,8 +145,8 @@ const watchSource = () => {
 
 // Main function to process files
 const compile = () => {
-  // Register callbacks
-  registerCallbacks();
+  // Register callbacks for the parser
+  registerParserCallbacks();
 
   const partials = loadPartials(args.partials); // Load partial templates
 
