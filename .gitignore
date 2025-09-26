@@ -1,6 +1,5 @@
 archived
-compiled/*
-!compiled/.gitkeep
+compiled
 dist
 demo/*
 !demo/.gitkeep
