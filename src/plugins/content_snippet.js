@@ -1,3 +1,7 @@
+/**
+ * Content snippet plugin
+ * Renders a content snippet with the provided parameters
+ */
 
 module.exports = (params, context, innerContent, data, parser) => {
   const template = `<div class="snippet">

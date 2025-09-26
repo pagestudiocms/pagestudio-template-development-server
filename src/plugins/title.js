@@ -1,3 +1,8 @@
+/**
+ * Title plugin
+ * Handles title formatting with various options
+ */
+
 module.exports = (trigger, parameters = {}, content = '', data = {}) => {
   let variableValue = data[trigger] || '';
 

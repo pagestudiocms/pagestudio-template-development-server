@@ -1,6 +1,11 @@
+/**
+ * Template footers plugin
+ * Generates footer HTML with JavaScript links from template configuration
+ */
+
 const path = require('path');
 const fs = require('fs');
-const { utils } = require('../lib/utils');
+const { utils } = require('../../lib/utils');
 
 let templateConfig = null,
     templateConfigPath = path.join(process.cwd(), 'src', 'template.conf');

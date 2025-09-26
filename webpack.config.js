@@ -4,14 +4,14 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   entry: {
     main: {
-      import: "./src/js/main.js",
+      import: "./example/js/main.js",
       filename: "main.js"
     },
-    style: "./src/scss/style.scss"
+    style: "./example/scss/style.scss"
   },
   output: {
-    path: path.resolve(__dirname, 'compiled/assets/'),
-    filename: 'js/[name].js'
+    path: path.resolve(__dirname, 'compiled/assets/js/'),
+    filename: '[name].js'
   },
   target: ['web', 'es6'],
   externals: {
@@ -43,7 +43,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/[name].css', // Output CSS files in build/assets/css
+      filename: '../css/[name].css', // Output CSS files in build/assets/css
     })
   ]
 };

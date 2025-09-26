@@ -29,7 +29,7 @@ const binpath = path.join(abspath, 'bin/');
 const libpath = path.join(abspath, 'lib/');
 
 const optionDefinitions = [
-  { name: 'watch', alias: 'w', type: String, defaultValue: 'compiled,src/html' },
+  { name: 'watch', alias: 'w', type: String, defaultValue: 'compiled,example/html' },
   { name: 'host', alias: 'h', type: String, defaultValue: '127.0.0.1' },
   { name: 'root', alias: 'r', type: String, defaultValue: 'compiled' },
   { name: 'port', alias: 'p', type: String, defaultValue: '8080' },
@@ -43,7 +43,7 @@ const watchDirectories = options.watch.split(',').map(dir => dir.trim()); // Con
 
 // Setup environment
 
-const ignore = 'app,bin,build,etc,lib,node_modules,src,var';
+const ignore = 'app,bin,build,etc,example,lib,node_modules,src,var';
 
 /**
  * Live Server Parameters

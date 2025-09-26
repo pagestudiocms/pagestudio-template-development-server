@@ -6,13 +6,13 @@ module.exports = function (grunt) {
     watch: {
       js: {
         files: [
-          'src/js/**/*.js',
+          'example/js/**/*.js',
         ],
         tasks: ['webpack'],
       },
       scss: {
         files: [
-          'src/scss/**/*.scss',
+          'example/scss/**/*.scss',
         ],
         tasks: ['webpack'],
       },

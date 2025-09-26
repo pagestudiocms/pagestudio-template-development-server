@@ -1,171 +1,40 @@
-const fs = require('fs');
+#!/usr/bin/env node
+
+/*!
+ * 
+ * Template Compiler CLI
+ * This is the command line interface for the template compiler
+ * 
+ */
+
 const path = require('path');
-const fse = require('fs-extra');
-const glob = require('glob');
-const chokidar = require('chokidar');
 const commandLineArgs = require('command-line-args');
-const { LexParser } = require('../lib/lexParser');
-
-const parser = new LexParser();
-
-// Import the callback registration and retrieval functions
-const { registerCallbacks, getCallback } = require('../callbacks/register');
+const { TemplateCompiler } = require('../src/compiler');
 
 // Define CLI argument options
 const options = [
   { name: "src", alias: "s", type: String, defaultValue: "src" },
   { name: "dest", alias: "d", type: String, defaultValue: "compiled" },
   { name: "partials", alias: "p", type: String, defaultValue: "src/partials" },
-  { name: "data-src", alias: "a", type: String, defaultValue: "src/html/data" }, // Directory for data.json files
+  { name: "data-src", alias: "a", type: String, defaultValue: "src/html/data" }, 
+  { name: "watch", alias: "w", type: Boolean, defaultValue: true }
 ];
+
+// Parse command line arguments
 const args = commandLineArgs(options);
 
-// Load partial templates from the specified directory
-const loadPartials = (partialsDir) => {
-  const partials = {};
-  if (fs.existsSync(partialsDir)) {
-    const partialFiles = glob.sync(path.join(partialsDir, '*.html'));
-    partialFiles.forEach((filePath) => {
-      const partialName = path.basename(filePath, '.html');
-      partials[partialName] = fs.readFileSync(filePath, 'utf-8');
-    });
-  } else {
-    console.error(`Partials directory "${partialsDir}" not found.`);
-  }
-  return partials;
-};
+// Initialize and run the template compiler with CLI arguments
+const compiler = new TemplateCompiler({
+  src: args.src,
+  dest: args.dest,
+  partials: args.partials,
+  'data-src': args['data-src']
+});
 
-// Function to compile and save the layout files
-const compileFile = (filePath, args, partials) => {
-  let layoutContent = fs.readFileSync(filePath, 'utf-8');
-  const layoutName = path.basename(filePath, '.html');
-  const dataFilePath = path.join(args['data-src'], `${layoutName}.data.json`);
+// Start compilation process
+compiler.compile();
 
-  // Load the context for the current layout if available
-  let context = {};
-  if (fs.existsSync(dataFilePath)) {
-    context = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8')); // Load specific context if the data file exists
-  } else {
-    console.log(`No data found for "${layoutName}". Using default context.`);
-  }
-
-  partials = loadPartials(args.partials);
-  // Process the template content
-  layoutContent = processTemplate(layoutContent, context, partials);
-
-  // Define the output path for the compiled layout in the compiled folder
-  const relativeFilePath = path.relative(args.src, filePath); // Remove the "src" folder part
-  const distFilePath = path.join(args.dest, relativeFilePath);
-
-  // Remove 'layouts' from the file path (we don't want the "layouts" folder in compiled)
-  const distFilePathWithoutLayouts = distFilePath.replace(/layouts\//, '');
-
-  // Create the necessary directories in the compiled folder
-  fse.ensureDirSync(path.dirname(distFilePathWithoutLayouts));
-
-  // Save the processed layout file to the compiled directory
-  fse.outputFileSync(distFilePathWithoutLayouts, layoutContent);
-  console.log(`Processed and saved: ${distFilePathWithoutLayouts}`);
-};
-
-const processTemplate = (layoutContent, context, partials) => {
-  let parsedContent = layoutContent;
-  let partialRegex = /{{\s*template:partial\s+name="([\w-]+)"\s*}}/g;
-
-  // Process partials first
-  parsedContent = parsedContent.replace(partialRegex, (match, partialName) => {
-    // console.log(`Processing partial: ${partialName}`);
-    if (partials[partialName]) {
-      // Process the partial content recursively in case it contains more partials
-      return processTemplate(partials[partialName], context, partials);
-    } else {
-      console.error(`Partial "${partialName}" not found.`);
-      return ''; // If partial is not found, replace with nothing
-    }
-  });
-
-  let specialtyTagRegex = /<([a-z]+):([a-z]+)([^>]*)\/>/g;
-  parsedContent = parsedContent.replace(specialtyTagRegex, (match, tagName, tagType, attributes) => {
-    return `{{ ${tagName}:${tagType} ${attributes.trim()} }}`;
-  });
-
-  const data = {
-    globalSetting: "some global value"
-  };
-  
-  // After processing the partials, parse the content with the provided context and callbacks
-  parsedContent = parser.parse(parsedContent, context, data);
-
-  return parsedContent;
-};
-
-const registerParserCallbacks = () => {
-  const callbacksDir = path.join(__dirname, '/../callbacks/');
-  const files = fs.readdirSync(callbacksDir);
-
-  files.forEach(file => {
-    if(file !== 'register.js') {
-      const callbackName = path.basename(file, '.js');
-      const callback = require(path.join(callbacksDir, file));
-      
-      // Assuming each callback needs to be passed the parser instance
-      const wrappedCallback = (params, context, innerContent, data) => {
-        return callback(params, context, innerContent, data, parser);
-      };
-      parser.registerFunction(callbackName, wrappedCallback);
-    }
-  });
-
-  console.log('Callbacks registered:', Object.keys(parser.callbacks));
-};
-
-// Watch the source directory for changes
-const watchSource = () => {
-  console.log('Watching for file changes...');
-  const filepath = [path.join(args.src, 'layouts')];
-
-  const watcher = chokidar.watch(filepath, {
-    persistent: true,
-    awaitWriteFinish: true,
-  });
-
-  watcher.on('change', (filePath) => {
-    if (filePath.endsWith('.html')) {
-      console.log(`File changed: ${filePath}`);
-      const partials = loadPartials(args.partials);
-      compileFile(filePath, args, partials);
-    }
-  });
-
-  // Print watched files after some time
-  setTimeout(() => {
-    console.log(watcher.getWatched());
-  }, 500);
-};
-
-// Main function to process files
-const compile = () => {
-  // Register callbacks for the parser
-  registerParserCallbacks();
-
-  const partials = loadPartials(args.partials); // Load partial templates
-
-  // Initially process all the layout files in the src directory
-  glob(path.join(args.src, 'layouts', '**/*.html'), (err, files) => {
-    if (err) {
-      console.error('Error reading files:', err);
-      return;
-    }
-
-    // Process each layout file
-    files.forEach((filePath) => {
-      compileFile(filePath, args, partials);
-    });
-  });
-
-  // Watch for changes in the source directory
-  watchSource();
-};
-
-// Start the process
-compile();
+// Start file watching if enabled
+if (args.watch) {
+  compiler.watch();
+}

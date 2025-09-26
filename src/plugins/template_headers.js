@@ -1,6 +1,11 @@
+/**
+ * Template headers plugin
+ * Generates header HTML with CSS and web font links from template configuration
+ */
+
 const path = require('path');
 const fs = require('fs');
-const { utils } = require('../lib/utils');
+const { utils } = require('../../lib/utils');
 
 var templateConfig = null,
   serverConfig = null,
