@@ -72,7 +72,9 @@ node bin/compile.js --src src/html --dest dist --dataDir src/html/data --partial
 Here’s an overview of the project’s directory structure:
 
 ```
-project/
+pagestudio-template-development-server/
+├── bin/
+│   └── template-compiler.js     # 🔧 SECONDARY: Specialized compilation tool
 ├── node_modules/            # Installed npm packages
 ├── build/                   # Output directory (compiled templates, assets)
 │   ├── assets/
@@ -93,7 +95,7 @@ project/
 │       └── partials/        # Partial templates (e.g., header, footer)
 ├── Gruntfile.js             # Grunt tasks configuration
 ├── package.json             # Project dependencies and scripts
-├── server.js                # Server setup for development
+├── server.js                # 🎯 PRIMARY: Main development server
 └── webpack.config.js        # Webpack configuration
 ```
 
