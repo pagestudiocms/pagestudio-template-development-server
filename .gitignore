@@ -1,10 +1,9 @@
 archived
-build/*
-!build/.gitkeep
+compiled/*
+!compiled/.gitkeep
 dist
 demo/*
 !demo/.gitkeep
-node_modules/*
-!node_modules/.gitkeep
-src/*
-!src/.gitkeep
+node_modules
+example/*
+!example/.gitkeep
