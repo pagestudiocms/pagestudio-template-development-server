@@ -110,3 +110,9 @@ You can modify `webpack.config.js` and `Gruntfile.js` to suit your specific proj
 
 - **Template Compilation**: You can manually trigger the template compilation by running `node bin/compile.js` with the appropriate flags for your project.
 - **Server Configuration**: The development server is based on `live-server` and runs by default at `http://localhost:9000/`. You can modify `server.js` to change server settings or routes.
+
+## Tests 
+
+Run tests 
+
+> node tests/templateCompiler.unit.test.js
