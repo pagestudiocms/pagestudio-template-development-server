@@ -33,17 +33,18 @@ const optionDefinitions = [
   { name: 'host', alias: 'h', type: String, defaultValue: '127.0.0.1' },
   { name: 'root', alias: 'r', type: String, defaultValue: 'compiled' },
   { name: 'port', alias: 'p', type: String, defaultValue: '8080' },
+  { name: 'open', alias: 'o', type: String, defaultValue: 'true' },
 ];
 const options = args(optionDefinitions);
 
 const webroot = path.resolve(process.cwd(), options.root);
 const watchDirectories = options.watch.split(',').map(dir => dir.trim()); // Convert the watch string into an array if it's provided
+const openBrowser = options.open.toLowerCase() === 'true';
+const ignore = 'app,bin,build,etc,example,lib,node_modules,src,var';
 
 // var homeDir = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 
 // Setup environment
-
-const ignore = 'app,bin,build,etc,example,lib,node_modules,src,var';
 
 /**
  * Live Server Parameters
@@ -52,7 +53,7 @@ const liveServerParams = {
   port: options.port,
   host: options.host,
   root: webroot,            // Set root directory that's being served. Defaults to cwd.
-  open: true,               // When false, it won't load your browser by default.
+  open: openBrowser,        // When false, it won't load your browser by default.
   ignore: ignore,           // comma-separated string for paths to ignore
   // file: 'default.html',    // When set, serve this file (server root relative) for every 404 (useful for single-page applications)
   wait: 2000,               // Waits for all changes, before reloading. Defaults to 0 sec.
