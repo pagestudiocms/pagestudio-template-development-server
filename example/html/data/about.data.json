@@ -1,0 +1,10 @@
+{
+  "title": "About Us",
+  "content": "Content section...",
+  "year": "2025", 
+  "site": {
+    "title": "My Site",
+    "description": "My site description",
+    "internalUrl": "http://localhost:8080"
+  }
+}

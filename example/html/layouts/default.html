@@ -1,0 +1,16 @@
+{{ template:partial name="header" }}
+<main>
+    <h2>{{ title }}</h2>
+    <p>{{ content }}</p> 
+    <p>Static conent for the home page...</p> 
+
+    {{ content:entries content_type="blog-articles" }}
+        <div class="entry">
+            <h3>{{ if url=="first-entry.html" }}<i class="first-entry"></i>{{ endif }} - {{ title }}</h3>
+            <p>{{ body }}</p>
+            <a href="{{ url }}">Read more</a> 
+            <p>{{ first_conditional_var }}</p>
+        </div>
+    {{ /content:entries }}
+</main>
+{{ template:partial name="footer" }}

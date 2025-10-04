@@ -1,0 +1,18 @@
+{
+  "title": "Welcome",
+  "content": "Content section...",
+  "year": "2025", 
+  "first_conditional_var": "<!-- first_conditional_var value -->", 
+  "entries": [
+    {
+      "title": "First Entry",
+      "body": "This is the body of the first entry.",
+      "url": "first-entry.html"
+    },
+    {
+      "title": "Second Entry",
+      "body": "This is the body of the second entry.",
+      "url": "second-entry.html"
+    }
+  ]
+}
