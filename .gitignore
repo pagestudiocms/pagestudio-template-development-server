@@ -4,5 +4,3 @@ dist
 demo/*
 !demo/.gitkeep
 node_modules
-example/*
-!example/.gitkeep
