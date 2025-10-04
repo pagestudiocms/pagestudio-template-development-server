@@ -21,6 +21,8 @@
     "live-server": "^1.2.2"
   },
   "devDependencies": {
+    "mocha": "^10.2.0",
+    "chai": "^4.3.8",
     "css-loader": "^7.1.2",
     "grunt": "^1.6.1",
     "grunt-contrib-concat": "^2.1.0",
@@ -35,11 +37,12 @@
     "webpack": "^5.97.1"
   },
   "scripts": {
+    "test": "mocha --recursive tests/**/*.spec.js",
     "grunt:build": "grunt webpack",
     "grunt:watch": "grunt watch",
     "build-assets": "grunt webpack",
     "build-watch-html": "node --trace-warnings bin/template-compiler.js --src example/html --dest compiled --data-src example/html/data --partials example/html/partials",
     "start": "npm-run-all --parallel grunt:watch build-watch-html start-server",
-    "start-server": "node server.js"
+    "start-server": "node server.js --open false"
   }
 }

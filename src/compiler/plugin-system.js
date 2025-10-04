@@ -30,13 +30,24 @@ class PluginSystem {
         
         // Store the plugin
         this.callbacks[pluginName] = plugin;
-        
-        // Register the plugin with the parser
-        // Wrap the plugin to provide parser instance if needed
-        const wrappedPlugin = (params, context, innerContent, data) => {
-          return plugin(params, context, innerContent, data, this.parser.getParser());
-        };
-        
+
+        // Register the plugin with the parser.
+        // We register a wrapper with arity 6 so the LexParser will pass the extended
+        // signature including helpers. The wrapper dispatches to the original plugin
+        // according to its declared parameters to preserve backwards compatibility.
+        const wrappedPlugin = function(params, context, innerRaw, innerParsed, data, helpers) {
+          // If the plugin expects the extended signature (6+ args), call it directly.
+          if (plugin.length >= 6) {
+            return plugin(params, context, innerRaw, innerParsed, data, helpers);
+          }
+          // If the plugin expects 5 args, assume signature (params, context, innerContent, data, parser)
+          if (plugin.length === 5) {
+            return plugin(params, context, innerParsed, data, this.parser.getParser());
+          }
+          // Fallback: legacy signature (params, context, innerContent, data)
+          return plugin(params, context, innerParsed, data);
+        }.bind(this);
+
         this.parser.registerFunction(pluginName, wrappedPlugin);
       }
     });
