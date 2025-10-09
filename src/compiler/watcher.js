@@ -17,7 +17,10 @@ const setupWatcher = (options) => {
   const { src, onFileChange } = options;
   
   console.log('Watching for file changes...');
-  const filepath = [path.join(src, 'layouts')];
+  const filepath = [
+    path.join(src, 'layouts'),
+    path.join(src, 'partials')
+  ];
 
   const watcher = chokidar.watch(filepath, {
     persistent: true,

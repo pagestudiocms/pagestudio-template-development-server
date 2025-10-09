@@ -38,6 +38,9 @@ class TemplateCompiler {
     
     // Load shared resources
     this.partials = loadPartials(this.options.partials);
+
+    // Track the last layout that was built
+    this.lastBuiltLayout = null;
   }
 
   /**
@@ -53,25 +56,34 @@ class TemplateCompiler {
    * @param {string} filePath - Path to template file
    */
   compileFile(filePath) {
+    const layoutPath = path.join(this.options.src, 'layouts');
+    const isLayoutFile = filePath.startsWith(layoutPath);
+    if( ! isLayoutFile) return;
+    
     // Read the template file
     const layoutContent = fs.readFileSync(filePath, 'utf-8');
     const layoutName = path.basename(filePath, '.html');
-    
+
+    // Track the last built layout
+    this.lastBuiltLayout = filePath;
+
     // Load the data for this template
     const context = loadTemplateData(layoutName, this.options.dataSrc);
-    
+
     // Process the template
     const processedContent = this.parser.processTemplate(
-      layoutContent, 
-      context, 
+      layoutContent,
+      context,
       this.partials
     );
-    
+
     // Save the processed template
     saveProcessedTemplate(processedContent, filePath, {
       src: this.options.src,
       dest: this.options.dest
     });
+
+    console.log(`Layout "${layoutName}" has been rebuilt.`);
   }
 
   /**
@@ -106,9 +118,28 @@ class TemplateCompiler {
     return setupWatcher({
       src: this.options.src,
       onFileChange: (filePath) => {
-        // Reload partials in case they changed
-        this.partials = loadPartials(this.options.partials);
-        this.compileFile(filePath);
+        const layoutPath = path.join(this.options.src, 'layouts');
+        const partialPath = path.join(this.options.src, 'partials');
+        const isLayoutFile = filePath.startsWith(layoutPath);
+        const isPartialFile = filePath.startsWith(partialPath);
+
+        if (isLayoutFile && filePath.endsWith('.html')) {
+          const layoutName = path.basename(filePath, '.html');
+
+          // Reload partials in case they changed
+          this.partials = loadPartials(this.options.partials);
+          console.log(`Rebuilding layout: ${layoutName}`);
+          this.compileFile(filePath);
+        } else if (isPartialFile && filePath.endsWith('.html')) {
+          // If a partial changes, rebuild the last built layout
+          if (this.lastBuiltLayout) {
+            console.log(`Partial changed: ${filePath}. Rebuilding last layout: ${this.lastBuiltLayout}.`);
+            this.partials = loadPartials(this.options.partials);
+            this.compileFile(this.lastBuiltLayout);
+          } else {
+            console.log(`Partial changed: ${filePath}, but no layout has been built yet.`);
+          }
+        }
       }
     });
   }
