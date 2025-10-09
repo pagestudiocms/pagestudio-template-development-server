@@ -15,10 +15,23 @@ const fs = require('fs'); // Added fs to check if 'compiled' exists
 const path = require("path"); 
 const args = require('command-line-args');
 
+// Retrieve version from package.json
+const packageJsonPath = path.join(__dirname, 'package.json');
+let packageVersion = 'unknown';
+
+if (fs.existsSync(packageJsonPath)) {
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    packageVersion = packageJson.version || 'unknown';
+  } catch (error) {
+    console.error(chalk.red('Error reading package.json:'), error);
+  }
+}
+
 // Setup defaults and options
 
 const meta = {
-  VERSION: '2.0.0-beta3',
+  VERSION: packageVersion,
   PUBLISHER: 'PageStudioCMS',
   YEAR: '2025',
 }
