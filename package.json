@@ -1,6 +1,6 @@
 {
   "name": "@pagestudiocms/pagestudio-template-development-server",
-  "version": "2.0.0-beta3",
+  "version": "2.1.0-beta1",
   "description": "This NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.",
   "keywords": [],
   "license": "MIT",
@@ -41,7 +41,7 @@
     "grunt:build": "grunt webpack",
     "grunt:watch": "grunt watch",
     "build-assets": "grunt webpack",
-    "build-watch-html": "node --trace-warnings bin/template-compiler.js --src example/html --out compiled --data-src example/html/data --partials example/html/partials --watch",
+    "build-watch-html": "node --trace-warnings bin/template-compiler.js --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts --watch",
     "start": "npm-run-all --parallel grunt:watch build-watch-html start-server",
     "start-server": "node server.js --open false"
   }

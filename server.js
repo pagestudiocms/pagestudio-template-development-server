@@ -47,6 +47,8 @@ const optionDefinitions = [
   { name: 'root', alias: 'r', type: String, defaultValue: 'compiled' },
   { name: 'port', alias: 'p', type: String, defaultValue: '8080' },
   { name: 'open', alias: 'o', type: String, defaultValue: 'true' },
+  { name: 'help', alias: '?', type: Boolean, defaultValue: false },       // <-- added
+  { name: 'version', alias: 'V', type: Boolean, defaultValue: false }
 ];
 const options = args(optionDefinitions);
 
@@ -54,6 +56,33 @@ const webroot = path.resolve(process.cwd(), options.root);
 const watchDirectories = options.watch.split(',').map(dir => dir.trim()); // Convert the watch string into an array if it's provided
 const openBrowser = options.open.toLowerCase() === 'true';
 const ignore = 'app,bin,build,etc,example,lib,node_modules,src,var';
+
+// Add help / version handling
+const printHelp = () => {
+  console.log(chalk.green('\nPageStudio Template Development Server — Usage\n'));
+  console.log(`  node server.js [options]\n`);
+  console.log(chalk.yellow('Options:'));
+  console.log(`  -w, --watch     Comma-separated folders to watch   (default: "compiled,example/html")`);
+  console.log(`  -r, --root      Root folder to serve              (default: "compiled")`);
+  console.log(`  -h, --host      Host to bind to                   (default: "127.0.0.1")`);
+  console.log(`  -p, --port      Port to listen on                 (default: "8080")`);
+  console.log(`  -o, --open      Open browser on start (true/false) (default: "true")`);
+  console.log(`  -V, --version   Print version and exit`);
+  console.log(`  -?, --help      Show this help message\n`);
+  console.log(chalk.cyan('Examples:'));
+  console.log('  node server.js --root compiled --port 3000');
+  console.log('  node server.js -w compiled,src -o false\n');
+};
+
+if (options.help) {
+  printHelp();
+  process.exit(0);
+}
+
+if (options.version) {
+  console.log(`${meta.VERSION}`);
+  process.exit(0);
+}
 
 // var homeDir = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 
