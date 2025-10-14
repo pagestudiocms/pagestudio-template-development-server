@@ -52,7 +52,7 @@ class PluginSystem {
       }
     });
 
-    console.log('Plugins registered:', Object.keys(this.callbacks));
+    // console.log('Plugins registered:', Object.keys(this.callbacks));
   }
 
   /**

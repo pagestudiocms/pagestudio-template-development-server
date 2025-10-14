@@ -20,16 +20,16 @@ class TemplateCompiler {
    * Create a new TemplateCompiler
    * @param {object} options - Compiler options
    * @param {string} options.src - Source directory
-   * @param {string} options.dest - Output directory
+   * @param {string} options.out - Output directory
    * @param {string} options.partials - Partials directory
    * @param {string} options.dataSrc - Data files directory
    */
   constructor(options) {
     this.options = {
       src: options.src || 'src',
-      dest: options.dest || 'compiled',
+      out: options.out || 'compiled',
       partials: options.partials || 'src/partials',
-      dataSrc: options['data-src'] || 'src/html/data'
+      dataSrc: options.dataSrc || 'src/html/data'
     };
     
     // Initialize components
@@ -80,7 +80,7 @@ class TemplateCompiler {
     // Save the processed template
     saveProcessedTemplate(processedContent, filePath, {
       src: this.options.src,
-      dest: this.options.dest
+      out: this.options.out
     });
 
     console.log(`Layout "${layoutName}" has been rebuilt.`);

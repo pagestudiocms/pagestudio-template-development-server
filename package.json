@@ -41,7 +41,7 @@
     "grunt:build": "grunt webpack",
     "grunt:watch": "grunt watch",
     "build-assets": "grunt webpack",
-    "build-watch-html": "node --trace-warnings bin/template-compiler.js --src example/html --dest compiled --data-src example/html/data --partials example/html/partials",
+    "build-watch-html": "node --trace-warnings bin/template-compiler.js --src example/html --out compiled --data-src example/html/data --partials example/html/partials --watch",
     "start": "npm-run-all --parallel grunt:watch build-watch-html start-server",
     "start-server": "node server.js --open false"
   }

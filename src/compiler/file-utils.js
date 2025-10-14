@@ -54,11 +54,11 @@ const loadTemplateData = (layoutName, dataDir) => {
  * @param {object} options - Options including src and dest directories
  */
 const saveProcessedTemplate = (content, filePath, options) => {
-  const { src, dest } = options;
+  const { src, out } = options;
 
   // Define the output path for the compiled layout in the compiled folder
   const relativeFilePath = path.relative(src, filePath); // Remove the "src" folder part
-  const distFilePath = path.join(dest, relativeFilePath);
+  const distFilePath = path.join(out, relativeFilePath);
 
   // Remove 'layouts' from the file path (we don't want the "layouts" folder in compiled)
   const distFilePathWithoutLayouts = distFilePath.replace(/layouts\//, '');

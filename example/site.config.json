@@ -1,0 +1,11 @@
+{
+  "src": "example/html",
+  "out": "compiled",
+  "layouts": "example/html/layouts",
+  "partials": "example/html/partials",
+  "data-src": "example/html/data",
+  "assets": "example/assets",
+  "config": "site.config.json",
+  "watch": true,
+  "minify": false
+}
