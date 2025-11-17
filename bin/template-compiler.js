@@ -48,7 +48,7 @@ const defaults = {
   out: "compiled",
   layouts: "src/html/layouts",
   partials: "src/html/partials",
-  "data-src": "src/html/data",
+  dataSrc: "src/html/data",
   assets: "src/assets",
   watch: false
 };
@@ -58,7 +58,7 @@ const finalConfig = {
   out: args.out ?? config.out ?? defaults.out,
   layouts: args.layouts ?? config.layouts ?? defaults.layouts,
   partials: args.partials ?? config.partials ?? defaults.partials,
-  dataSrc: args['data-src'] ?? config['data-src'] ?? defaults['data-src'],
+  dataSrc: args['data-src'] ?? config['data-src'] ?? defaults.dataSrc,
   assets: args.assets ?? config.assets ?? defaults.assets,
   watch: args.watch ?? config.watch ?? defaults.watch
 };
