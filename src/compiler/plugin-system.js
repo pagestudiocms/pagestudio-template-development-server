@@ -15,10 +15,13 @@ class PluginSystem {
   /**
    * Register all plugins from the plugins directory
    * @param {string} pluginsDir - Path to plugins directory
+   * @param {boolean} isOptional - Whether the directory is optional (won't show error if missing)
    */
-  registerPlugins(pluginsDir) {
+  registerPlugins(pluginsDir, isOptional = false) {
     if (!fs.existsSync(pluginsDir)) {
-      console.error(`Plugins directory "${pluginsDir}" not found.`);
+      if (!isOptional) {
+        console.error(`Plugins directory "${pluginsDir}" not found.`);
+      }
       return;
     }
 
@@ -36,13 +39,20 @@ class PluginSystem {
         // signature including helpers. The wrapper dispatches to the original plugin
         // according to its declared parameters to preserve backwards compatibility.
         const wrappedPlugin = function(params, context, innerRaw, innerParsed, data, helpers) {
+          // Get the actual parameter names to handle default parameters correctly
+          const funcStr = plugin.toString();
+          const paramMatch = funcStr.match(/\(([^)]*)\)/);
+          const paramList = paramMatch ? paramMatch[1].split(',').map(p => p.trim().split('=')[0].trim()) : [];
+          const actualParamCount = paramList.length;
+          
           // If the plugin expects the extended signature (6+ args), call it directly.
-          if (plugin.length >= 6) {
+          if (actualParamCount >= 6) {
             return plugin(params, context, innerRaw, innerParsed, data, helpers);
           }
           // If the plugin expects 5 args, assume signature (params, context, innerContent, data, parser)
-          if (plugin.length === 5) {
-            return plugin(params, context, innerParsed, data, this.parser.getParser());
+          if (actualParamCount === 5) {
+            const parser = this.parser.getParser();
+            return plugin(params, context, innerParsed, data, parser);
           }
           // Fallback: legacy signature (params, context, innerContent, data)
           return plugin(params, context, innerParsed, data);

@@ -5,6 +5,7 @@
 
 const chokidar = require('chokidar');
 const path = require('path');
+const colors = require('colors');
 
 /**
  * Set up a file watcher for template files
@@ -16,7 +17,22 @@ const path = require('path');
 const setupWatcher = (options) => {
   const { src, onFileChange } = options;
   
-  console.log('Watching for file changes...');
+  /**
+   * Executes the callback on file changes within passed folder.
+   * Ignores changes on files matching `excludePatterns`.
+   *
+   * @param  {string} filePath - path of the changed file
+   */
+  function doCallback(filePath) {
+    if ( ! filePath.endsWith('.html')) {
+      return;
+    }
+    console.log(colors.cyan.bold('Change detected at %s'), filePath);
+    if (typeof onFileChange === 'function') {
+      onFileChange(filePath);
+    }
+  }
+  
   const filepath = [
     path.join(src, 'layouts'),
     path.join(src, 'partials')
@@ -27,12 +43,12 @@ const setupWatcher = (options) => {
     awaitWriteFinish: true,
   });
 
-  watcher.on('change', (filePath) => {
-    if (filePath.endsWith('.html')) {
-      console.log(`File changed: ${filePath}`);
-      onFileChange(filePath);
-    }
+  watcher.on('ready', () => {
+    console.log(colors.green.bold('Initial scan complete. Watching for file changes in %s ...', filepath.join(', ')));
   });
+  watcher.on('change', doCallback);
+  watcher.on('add', doCallback);
+  watcher.on('unlink', doCallback);
 
   // Print watched files after some time
   setTimeout(() => {

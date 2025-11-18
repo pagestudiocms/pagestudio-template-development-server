@@ -47,8 +47,13 @@ class TemplateCompiler {
    * Register all template plugins
    */
   registerPlugins() {
-    const pluginsDir = path.join(process.cwd(), 'src', 'plugins');
-    this.pluginSystem.registerPlugins(pluginsDir);
+    // First, register core plugins from the main package
+    const corePluginsDir = path.join(__dirname, '..', 'plugins');
+    this.pluginSystem.registerPlugins(corePluginsDir, false);
+    
+    // Then, register any consumer project plugins (optional)
+    const consumerPluginsDir = path.join(process.cwd(), 'src', 'plugins');
+    this.pluginSystem.registerPlugins(consumerPluginsDir, true);
   }
 
   /**
