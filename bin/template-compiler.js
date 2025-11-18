@@ -18,11 +18,31 @@ const options = [
   { name: "data-src", alias: "d", type: String },
   { name: "assets", alias: "a", type: String },
   { name: "config", alias: "c", type: String },
-  { name: "watch", alias: "w", type: Boolean }
+  { name: "watch", alias: "w", type: Boolean },
+  { name: "help", alias: "h", type: Boolean }
 ];
 
 // Parse command line arguments
 const args = commandLineArgs(options);
+
+// Show help if requested
+if (args.help) {
+  console.log('PageStudio Template Compiler');
+  console.log('');
+  console.log('Usage: pagestudio-compile [options]');
+  console.log('');
+  console.log('Options:');
+  console.log('  -s, --src <path>        Source directory');
+  console.log('  -o, --out <path>        Output directory');
+  console.log('  -l, --layouts <path>    Layouts directory');
+  console.log('  -p, --partials <path>   Partials directory');
+  console.log('  -d, --data-src <path>   Data directory');
+  console.log('  -a, --assets <path>     Assets directory');
+  console.log('  -c, --config <path>     Config file path');
+  console.log('  -w, --watch             Watch for file changes');
+  console.log('  -h, --help              Show this help');
+  process.exit(0);
+}
 
 // Validate config file path if provided
 if (args.config && !fs.existsSync(args.config)) {

@@ -10,7 +10,9 @@
   },
   "main": "server.js",
   "bin": {
-    "pagestudio-server": "./server.js"
+    "pagestudio-server": "./server.js",
+    "pagestudio-compile": "./bin/template-compiler.js",
+    "pagestudio-dev": "./bin/pagestudio-dev.js"
   },
   "dependencies": {
     "chalk": "^4.1.2",
@@ -18,9 +20,7 @@
     "command-line-args": "^6.0.1",
     "figlet": "^1.8.0",
     "fs-extra": "^11.3.0",
-    "live-server": "^1.2.2"
-  },
-  "devDependencies": {
+    "live-server": "^1.2.2",
     "mocha": "^10.2.0",
     "chai": "^4.3.8",
     "css-loader": "^7.1.2",
@@ -36,13 +36,17 @@
     "watch": "^1.0.2",
     "webpack": "^5.97.1"
   },
+  "devDependencies": {
+  },
   "scripts": {
     "test": "mocha --recursive tests/**/*.spec.js",
     "grunt:build": "grunt webpack",
     "grunt:watch": "grunt watch",
     "build-assets": "grunt webpack",
     "build-watch-html": "node --trace-warnings bin/template-compiler.js --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts --watch",
-    "start": "npm-run-all --parallel grunt:watch build-watch-html start-server",
-    "start-server": "node server.js --open false"
+    "dev": "node bin/pagestudio-dev.js --src example/html --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
+    "start": "node bin/pagestudio-dev.js --src example/html --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
+    "start-server": "node server.js --open false",
+    "compile": "node bin/template-compiler.js --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts"
   }
 }
