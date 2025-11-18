@@ -4,10 +4,11 @@ This Node.js command-line tool sets up a development server that simplifies loca
 
 ## Features
 
-- Local development server running on `http://localhost:8080/`.
-- Watch for changes in template, SCSS, and JS files.
-- Template compilation, asset bundling, and live reloading.
-- Integrated with Grunt and Webpack for JS/SCSS compilation and bundling.
+- Local development server with live reloading
+- Watch for changes in template, SCSS, and JS files
+- Template compilation, asset bundling, and live reloading
+- Integrated with Grunt and Webpack for JS/SCSS compilation and bundling
+- Easy-to-use CLI commands for different development workflows
 
 ## Installation
 
@@ -24,10 +25,8 @@ npm install @pagestudiocms/pagestudio-template-development-server
 #### From GitHub:
 
 ```bash
-npm install git+https://github.com/your-username/pagestudio-template-development-server.git
+npm install git+https://github.com/pagestudiocms/pagestudio-template-development-server.git
 ```
-
-After installation, the development server will be available to run as an npm script from your project.
 
 ### Requirements
 
@@ -35,36 +34,87 @@ After installation, the development server will be available to run as an npm sc
 
 ## Usage
 
-### Start the Development Server
+### CLI Commands
 
-Once the package is installed, you can run the development server using npm:
+After installation, you have access to three main CLI commands:
 
-```bash
-npm run start-server
-```
-
-This command will start the server, and you can access your project locally at:
-
-```
-http://localhost:9000/
-```
-
-The server will automatically watch for changes in your template, SCSS, and JavaScript files, recompiling them as necessary.
-
-### Watching and Rebuilding Files
-
-The package is configured to use Grunt to watch and recompile the assets as needed. You can run the watch task with:
+#### 1. Full Development Environment (Recommended)
 
 ```bash
-npm run grunt:watch
+npx pagestudio-dev
 ```
 
-### Manual Template Compilation
+This command starts both the template compiler (with file watching) and the development server. It's the easiest way to get started.
 
-To manually compile templates and assets, use the following command (replace paths with your source files):
+**Options:**
+```bash
+npx pagestudio-dev --src templates --out dist --port 8080 --config my-config.json
+```
+
+- `--src <path>` - Source directory (default: `src/html`)
+- `--out <path>` - Output directory (default: `compiled`)
+- `--layouts <path>` - Layouts directory (default: `src/html/layouts`)
+- `--partials <path>` - Partials directory (default: `src/html/partials`)
+- `--data-src <path>` - Data directory (default: `src/html/data`)
+- `--port <number>` - Server port (default: `3000`)
+- `--open <boolean>` - Open browser automatically (default: `true`)
+- `--config <path>` - Config file path
+- `--help, -h` - Show help
+
+#### 2. Template Compilation Only
 
 ```bash
-node bin/compile.js --src src/html --dest dist --dataDir src/html/data --partials src/html/partials
+npx pagestudio-compile
+```
+
+Compiles templates without starting the server. Useful for build processes.
+
+#### 3. Development Server Only
+
+```bash
+npx pagestudio-server
+```
+
+Starts only the development server without template compilation.
+
+### Using in Your Project
+
+Add to your project's `package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "pagestudio-dev",
+    "build": "pagestudio-compile",
+    "serve": "pagestudio-server"
+  }
+}
+```
+
+Then run:
+
+```bash
+npm run dev    # Start full development environment
+npm run build  # Compile templates only
+npm run serve  # Start server only
+```
+
+### Configuration File
+
+Create a `site.config.json` file in your project root:
+
+```json
+{
+  "src": "src/html",
+  "out": "compiled",
+  "layouts": "src/html/layouts",
+  "partials": "src/html/partials",
+  "data-src": "src/html/data",
+  "assets": "src/assets",
+  "port": 3000,
+  "open": true,
+  "watch": true
+}
 ```
 
 ## Project Structure
