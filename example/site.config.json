@@ -7,5 +7,7 @@
   "assets": "example/assets",
   "config": "site.config.json",
   "watch": true,
-  "minify": false
+  "minify": false,
+  "port": 3000,
+  "open": true
 }
