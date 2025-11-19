@@ -5,7 +5,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const { utils } = require('../../lib/utils');
+const { utils } = require('../lib/utils');
 
 var templateConfig = null,
   serverConfig = null,

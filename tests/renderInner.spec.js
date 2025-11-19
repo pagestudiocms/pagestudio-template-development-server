@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { LexParser } = require('../lib/lexParser');
+const { LexParser } = require('../src/lib/lexParser');
 const contentEntries = require('../src/plugins/content_entries');
 
 describe('renderInner helper', () => {

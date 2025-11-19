@@ -1,6 +1,6 @@
 const assert = require('assert');
-const { LexParser } = require('../lib/lexParser');
-const { TestRunner } = require('../lib/testRunner');
+const { LexParser } = require('../src/lib/lexParser');
+const { TestRunner } = require('../src/lib/testRunner');
 
 // --- Tests ---
 const parser = new LexParser();

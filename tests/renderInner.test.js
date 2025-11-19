@@ -1,4 +1,4 @@
-const { LexParser } = require('../lib/lexParser');
+const { LexParser } = require('../src/lib/lexParser');
 const path = require('path');
 
 // Load plugin

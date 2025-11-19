@@ -4,7 +4,7 @@
  */
 
 const path = require('path');
-const { LexParser } = require('../../lib/lexParser');
+const { LexParser } = require('../lib/lexParser');
 
 class Parser {
   constructor() {

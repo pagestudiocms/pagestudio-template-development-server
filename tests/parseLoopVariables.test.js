@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const fse = require('fs-extra');
-const LexParser = require('../lib/lexParser');
+const LexParser = require('../src/lib/lexParser');
 const { file } = require('grunt');
 const parser = new LexParser();  // Now create an instance
 

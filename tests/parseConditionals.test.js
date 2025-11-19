@@ -1,4 +1,4 @@
-const LexParser = require('../lib/lexParser'); // Adjust the path as needed
+const LexParser = require('../src/lib/lexParser'); // Adjust the path as needed
 
 const parser = new LexParser();
 

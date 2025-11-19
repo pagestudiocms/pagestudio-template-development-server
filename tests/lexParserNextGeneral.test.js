@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { LexParser } = require('../lib/lexParser');
+const { LexParser } = require('../src/lib/lexParser');
 
 // Create a new parser instance.
 const parser = new LexParser();

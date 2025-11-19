@@ -3,7 +3,7 @@
  * Provides sample user data for templates
  */
 
-const { LexParser } = require('../../lib/lexParser');
+const { LexParser } = require('../lib/lexParser');
 const parser = new LexParser();
 
 module.exports = (trigger, parameters = {}, content = '', data = {}) => {

@@ -79,3 +79,7 @@ Pick one of the first two items to start (Context abstraction or safe expression
 ---
 
 *Saved plan in `PLAN.md`.*
+
+- Add more unit tests (loops, nested callbacks).
+- Performance: AST caching for inner templates. Add caching for parsed inner ASTs to improve performance.
+- Add a README snippet documenting the plugin helper API (helpers.renderInner, helpers.resolveVariables).

@@ -1,0 +1,122 @@
+<!-- Start -->
+<main>
+    <h2>{{ title }}</h2>
+    <p>{{ content }}</p> 
+    <p>Static conent for the home page...</p> 
+
+    {{ if title == "Parsing Order" }}
+        <p>This paragraph is shown only on the Parsing Order page.</p>
+        {{ first_conditional_var }}
+    {{ else }}
+        <p>This paragraph is shown on all other pages.</p>
+        {{ second_conditional_var }}
+    {{ endif }}
+
+     <p>Below are blog articles fetched from the content entries:</p>
+
+    {{ content:entries content_type="blog-articles" }}
+        <div class="entry">
+            <h3>{{ if url=="home" }}<i class="home-page"></i>{{ endif }} - {{ title }}</h3>
+            <p>{{ body }}</p>
+            <a href="{{ url }}">Read more</a> 
+            {{ content:snippet snippet="blog-code" }}
+        </div>
+    {{ /content:entries }}
+</main>
+
+<!-- After first pass -->
+<main>
+    <h2>{{ title }}</h2>
+    <p>{{ content }}</p> 
+    <p>Static conent for the home page...</p> 
+
+        <p>This paragraph is shown only on the Parsing Order page.</p>
+        {{ first_conditional_var }}
+
+     <p>Below are blog articles fetched from the content entries:</p>
+
+    {{ content:entries content_type="blog-articles" }}
+        <div class="entry">
+            <h3>{{ if url=="home" }}<i class="home-page"></i>{{ endif }} - {{ title }}</h3>
+            <p>{{ body }}</p>
+            <a href="{{ url }}">Read more</a> 
+            {{ content:snippet snippet="blog-code" }}
+        </div>
+    {{ /content:entries }}
+</main>
+
+<!-- After second pass -->
+<main>
+    <h2>{{ title }}</h2>
+    <p>{{ content }}</p> 
+    <p>Static conent for the home page...</p> 
+
+        <p>This paragraph is shown only on the Parsing Order page.</p>
+        {{ first_conditional_var }}
+
+     <p>Below are blog articles fetched from the content entries:</p>
+
+    {{ content:entries content_type="blog-articles" }}
+        <div class="entry">
+            <h3>{{ if url=="home" }}<i class="home-page"></i>{{ endif }} - {{ title }}</h3>
+            <p>{{ body }}</p>
+            <a href="{{ url }}">Read more</a> 
+            <!-- content from snippet callback -->
+            {{ first_conditional_var }}
+        </div>
+    {{ /content:entries }}
+</main>
+
+<!-- After third pass -->
+<main>
+    <h2>{{ title }}</h2>
+    <p>{{ content }}</p> 
+    <p>Static conent for the home page...</p> 
+
+        <p>This paragraph is shown only on the Parsing Order page.</p>
+        {{ first_conditional_var }}
+
+     <p>Below are blog articles fetched from the content entries:</p>
+
+    <div class="entry" id="001">
+        <h3><i class="home-page"></i> - First Entry</h3>
+        <p>This is the body of the first entry.</p>
+        <a href="first-entry">Read more</a> 
+        <!-- content from snippet callback -->
+        {{ first_conditional_var }}
+    </div>
+    <div class="entry" id="002">
+        <h3><i class="home-page"></i> - Second Entry</h3>
+        <p>This is the body of the second entry.</p>
+        <a href="second-entry">Read more</a> 
+        <!-- content from snippet callback -->
+        {{ first_conditional_var }}
+    </div>
+</main>
+
+<!-- Finished -->
+<main>
+    <h2>Home Page</h2>
+    <p>Welcome To Your New Home</p> 
+    <p>Static conent for the home page...</p> 
+
+        <p>This paragraph is shown only on the Parsing Order page.</p>
+        <!-- first_conditional_var value -->
+
+     <p>Below are blog articles fetched from the content entries:</p>
+
+    <div class="entry" id="001">
+        <h3><i class="home-page"></i> - First Entry</h3>
+        <p>This is the body of the first entry.</p>
+        <a href="first-entry">Read more</a> 
+        <!-- content from snippet callback -->
+        <!-- first_conditional_var value -->
+    </div>
+    <div class="entry" id="002">
+        <h3><i class="home-page"></i> - Second Entry</h3>
+        <p>This is the body of the second entry.</p>
+        <a href="second-entry">Read more</a> 
+        <!-- content from snippet callback -->
+        <!-- first_conditional_var value -->
+    </div>
+</main>

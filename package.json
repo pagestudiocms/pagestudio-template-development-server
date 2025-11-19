@@ -1,6 +1,6 @@
 {
   "name": "@pagestudiocms/pagestudio-template-development-server",
-  "version": "2.1.0-beta1",
+  "version": "3.0.0-beta1",
   "description": "This NodeJS command line tool sets up a development server on your computer, allowing PageStudio template developers to work on template code locally. It watches your template and recompiles when changes are made.",
   "keywords": [],
   "license": "MIT",
@@ -8,27 +8,26 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
-  "main": "server.js",
+  "main": "src/compiler/index.js",
   "bin": {
-    "pagestudio-server": "./server.js",
-    "pagestudio-compile": "./bin/template-compiler.js",
-    "pagestudio-dev": "./bin/pagestudio-dev.js"
+    "pagestudio": "./bin/pagestudio.js"
   },
   "dependencies": {
+    "chai": "^4.3.8",
     "chalk": "^4.1.2",
     "chokidar": "^4.0.3",
     "command-line-args": "^6.0.1",
+    "commander": "^14.0.2",
+    "css-loader": "^7.1.2",
     "figlet": "^1.8.0",
     "fs-extra": "^11.3.0",
-    "live-server": "^1.2.2",
-    "mocha": "^10.2.0",
-    "chai": "^4.3.8",
-    "css-loader": "^7.1.2",
     "grunt": "^1.6.1",
     "grunt-contrib-concat": "^2.1.0",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-webpack": "^7.0.0",
+    "live-server": "^1.2.2",
     "mini-css-extract-plugin": "^2.9.2",
+    "mocha": "^10.2.0",
     "node-watch": "^0.7.4",
     "npm-run-all": "^4.1.5",
     "sass": "^1.83.1",
@@ -36,17 +35,15 @@
     "watch": "^1.0.2",
     "webpack": "^5.97.1"
   },
-  "devDependencies": {
-  },
   "scripts": {
     "test": "mocha --recursive tests/**/*.spec.js",
     "grunt:build": "grunt webpack",
     "grunt:watch": "grunt watch",
     "build-assets": "grunt webpack",
-    "build-watch-html": "node --trace-warnings bin/template-compiler.js --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts --watch",
-    "dev": "node bin/pagestudio-dev.js --src example/html --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
-    "start": "node bin/pagestudio-dev.js --src example/html --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
-    "start-server": "node server.js --open false",
-    "compile": "node bin/template-compiler.js --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts"
+    "build-watch-html": "node bin/pagestudio.js compile --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts --watch",
+    "dev": "node bin/pagestudio.js dev --src example/html --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
+    "start": "node bin/pagestudio.js dev --src example/html --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
+    "server": "node bin/pagestudio.js server",
+    "compile": "node bin/pagestudio.js compile --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts"
   }
 }

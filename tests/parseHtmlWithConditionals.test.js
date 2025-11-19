@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const { LexParser, ParseConditionals } = require('../lib/lexParser'); // Adjust the path as needed
+const { LexParser, ParseConditionals } = require('../src/lib/lexParser'); // Adjust the path as needed
 
 // Example Usage
 const data = {
