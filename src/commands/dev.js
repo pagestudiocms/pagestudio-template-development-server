@@ -49,7 +49,8 @@ exports.run = (options) => {
   // Start template compiler with watch mode
   const compilerArgs = [
     '--trace-warnings',
-    path.join(__dirname, '../../bin/template-compiler.js'),
+    path.join(__dirname, '../../bin/pagestudio.js'),
+    'compile',
     '--src', options.src,
     '--out', options.out,
     '--data-src', options.dataSrc,
@@ -72,7 +73,8 @@ exports.run = (options) => {
 
   // Start development server
   const serverArgs = [
-    path.join(__dirname, '../../server.js'),
+    path.join(__dirname, '../../bin/pagestudio.js'),
+    'server',
     '--port', options.port.toString(),
     '--open', options.open.toString()
   ];
