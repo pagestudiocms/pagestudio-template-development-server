@@ -44,6 +44,19 @@ program
     require('../src/commands/server').run(options);
   });
 
+program
+  .command('proxy-server')
+  .description('Start development server with live reload')
+  .option('-p, --port <port>', 'Port to listen on', '8080')
+  .option('-h, --host <host>', 'Host to bind to', '127.0.0.1')
+  .option('-r, --root <root>', 'Root folder to serve', 'compiled')
+  .option('-w, --watch <dirs>', 'Comma-separated directories to watch', 'compiled,example/html')
+  .option('-o, --open <bool>', 'Open browser on start', 'true')
+  .action((options) => {
+    options.version = packageVersion;
+    require('../src/commands/proxy-server').run(options);
+  });
+
 // Compile command
 program
   .command('compile')
