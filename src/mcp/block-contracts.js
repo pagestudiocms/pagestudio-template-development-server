@@ -8,7 +8,17 @@ function loadBlockContract(name, directory) {
     throw new Error('block name must contain only lowercase letters, digits and hyphens');
   }
   const root = path.resolve(directory || process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR || path.join(process.cwd(), 'block-contracts'));
-  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json'), 'utf8'));
+  const readFile = (filename) => {
+    try {
+      return fs.readFileSync(path.join(root, filename), 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        throw new Error(`Missing PageStudio contract file: ${path.join(root, filename)}`, { cause: error });
+      }
+      throw error;
+    }
+  };
+  const manifest = JSON.parse(readFile('manifest.json'));
   if (manifest.schemaVersion !== '1.0' || manifest.renderer !== 'cms-built-in') {
     throw new Error('Unsupported block contract manifest version or renderer');
   }
@@ -18,11 +28,14 @@ function loadBlockContract(name, directory) {
   if (!fixture || fixture.status !== 'rendered' || !fixture.input || !fixture.html) {
     throw new Error('No successful HTML fixture for block: ' + name);
   }
+  if (fixture.input !== `block-${name}.json` || fixture.html !== `block-${name}.html`) {
+    throw new Error('Invalid fixture mapping for block: ' + name);
+  }
   const readFixture = (file) => {
     if (typeof file !== 'string' || !/^block-[a-z0-9-]+\.(json|html)$/.test(file)) {
       throw new Error('Unsafe fixture filename');
     }
-    return fs.readFileSync(path.join(root, file), 'utf8');
+    return readFile(file);
   };
   return {
     schemaVersion: manifest.schemaVersion,
