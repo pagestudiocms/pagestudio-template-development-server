@@ -99,6 +99,25 @@ program
     require('../src/commands/clean').run(options);
   });
 
+// Contract bundle management (local CMS export source).
+const contracts = program.command('contracts').description('Manage project-local CMS block contracts');
+contracts.command('sync')
+  .description('Copy and validate an exported CMS contract bundle into .pagestudio/contracts')
+  .requiredOption('--from <directory>', 'Directory containing the CMS contract export')
+  .option('--project-root <directory>', 'Template project root (defaults to PAGESTUDIO_PROJECT_ROOT or cwd)')
+  .action((options) => {
+    try {
+      const result = require('../src/commands/contracts').syncContracts({
+        source: options.from,
+        projectRoot: options.projectRoot || process.env.PAGESTUDIO_PROJECT_ROOT || process.cwd()
+      });
+      console.log(`Synced ${result.blocks} CMS block contracts to ${result.destination}`);
+    } catch (error) {
+      console.error(chalk.red('Contract sync failed:'), error.message);
+      process.exitCode = 1;
+    }
+  });
+
 // Parse command line arguments
 program.parse(process.argv);
 
