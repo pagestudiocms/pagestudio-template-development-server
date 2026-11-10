@@ -48,13 +48,17 @@ describe('CMS block contract loader', function () {
   });
   it('rejects unsafe fixture paths', function () {
     manifest.fixtures[0].html = '../outside.html'; save();
-    assert.throws(() => loadBlockContract('button', root), /Unsafe fixture/);
+    assert.throws(() => loadBlockContract('button', root), /Invalid fixture mapping/);
+  });
+  it('rejects a valid-looking fixture from another block', function () {
+    manifest.fixtures[0].html = 'block-image.html'; save();
+    assert.throws(() => loadBlockContract('button', root), /Invalid fixture mapping/);
   });
   it('reports missing manifests and missing fixture files', function () {
     fs.rmSync(path.join(root, 'manifest.json'));
-    assert.throws(() => loadBlockContract('button', root), /ENOENT/);
+    assert.throws(() => loadBlockContract('button', root), /Missing PageStudio contract file/);
     save();
     fs.rmSync(path.join(root, 'block-button.html'));
-    assert.throws(() => loadBlockContract('button', root), /ENOENT/);
+    assert.throws(() => loadBlockContract('button', root), /Missing PageStudio contract file/);
   });
 });
