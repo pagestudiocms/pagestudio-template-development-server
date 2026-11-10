@@ -14,7 +14,9 @@
     "pagestudio-mcp": "./bin/pagestudio-mcp.js"
   },
   "dependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "acorn": "^8.19.0",
     "chai": "^4.3.8",
     "chalk": "^4.1.2",
     "chokidar": "^4.0.3",

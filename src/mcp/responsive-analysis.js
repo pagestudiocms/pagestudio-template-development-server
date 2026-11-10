@@ -2,6 +2,7 @@
 
 const mediaParser = require('postcss-media-query-parser').default;
 const valueParser = require('postcss-value-parser');
+const { findingLocation, mappingEvidence } = require('./diagnostics');
 const PROPERTIES = new Set(['display', 'visibility', 'width', 'min-width', 'max-width', 'overflow-x']);
 
 function pixels(source) {
@@ -92,10 +93,10 @@ function analyzeResponsive(analysis) {
     }
     if (record.status !== 'matched' || !intervals.length) continue;
     const make = (ruleId, declaration, match, message, evidence, explanation, recommendation) => ({
-      ruleId, severity: 'warning', file: record.file, line: declaration.line, column: declaration.column,
+      ruleId, severity: 'warning', ...findingLocation(record, declaration),
       selector: record.selector, block: match.block, message,
       evidence: { fixture: match.fixture, elements: match.evidence, media: record.media,
-        intervals: serialIntervals(intervals), declaration, ...evidence }, explanation, recommendation
+        intervals: serialIntervals(intervals), declaration, ...mappingEvidence(record, declaration), ...evidence }, explanation, recommendation
     });
     for (const declaration of record.declarations) {
       if (['width', 'min-width'].includes(declaration.property)) {

@@ -33,10 +33,11 @@ describe('Contract-aware stylesheet discovery and matching', function () {
   it('discovers SCSS without executing imports or inventing matches for nesting and state', function () {
     write(root, 'site.scss', '@use "missing";\n.btn {color:red; &:hover {color:blue}}\n#{ $selector } {color:red}\na:hover, a::before {color:red}\n@keyframes fade { from {opacity:0} }');
     const result = analyzeStylesheets(root);
-    assert.equal(result.selectors[0].status, 'matched');
-    assert.ok(result.selectors.slice(1).every(item => item.status === 'unsupported'));
-    assert.ok(result.limitations.some(item => item.includes('@use')));
-    assert.ok(!result.selectors.some(item => item.selector === 'from'));
+    assert.deepEqual(result.selectors, []);
+    assert.equal(result.sourceStylesheets[0].constructs[0].name, '@use');
+    assert.ok(result.sourceStylesheets[0].selectors.some(item => item.selector === '&:hover'));
+    assert.ok(result.limitations.some(item => item.includes('SCSS source')));
+    assert.ok(result.findings.some(item => item.ruleId === 'PS-ASSET-001'));
   });
   it('reports each selector location within multiline lists', function () {
     write(root, 'site.css', '\n.a,\n  h1[style], .btn {color:red}');

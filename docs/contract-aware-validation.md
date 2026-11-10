@@ -1,5 +1,12 @@
 # Contract-aware validation
 
+The current design uses the existing template asset build's **emitted CSS** for
+fixture matching, compatibility and responsive checks. CSS/SCSS source has a
+separate authoring pass, and source maps provide SCSS locations where usable.
+See [Gourmet build review and current CSS design](css-build-validation.md).
+The phase counts/commits below record the original implementation milestones;
+the build-aware revision is documented after them.
+
 ## Phase 1: stylesheet discovery and matching
 
 `src/mcp/stylesheet-analysis.js` discovers CSS/SCSS in sorted project-relative
@@ -14,14 +21,18 @@ Selector records contain source location, declarations, media context and
 element count and up to three attribute/tag samples. Unmatched means only that no
 loaded sample matched. It never makes a template invalid.
 
-Discovery excludes hidden paths, symlinks, dependencies and generated
-`build`, `dist`, `coverage` directories. Limits: 10,000 directory entries, 500
+Authoring discovery excludes hidden paths, symlinks, dependencies and generated
+`build`, `dist`, `compiled`, `coverage` directories. Build-produced CSS is
+discovered separately from expected output paths, including generated directories.
+Limits: 10,000 directory entries, 500
 stylesheets/blocks, 1 MiB per file and 10 MiB each for stylesheets and fixtures.
 Missing/invalid bundles and skipped files become explicit limitations.
 `PS-CSS-001` is a parser error with parser location; valid files remain analyzed.
 
-SCSS is not compiled: imports, variables, mixins, interpolation and nesting are
-not evaluated. Dynamic pseudo classes, pseudo elements and namespaces are
+SCSS is not compiled by validation: imports, variables, mixins, interpolation
+and nesting are resolved by the project's existing build and inspected through
+its emitted CSS. Raw SCSS is parsed for authoring diagnostics only.
+Dynamic pseudo classes, pseudo elements and namespaces are
 unsupported. Keyframe steps are not DOM selectors. Stylesheet discovery does not
 establish which stylesheets a page loads or the browser cascade.
 
@@ -108,10 +119,13 @@ locations identify each individual selector, including multiline lists.
 - Fixtures are finite fragments. Ancestors, sibling variants, alternate CMS
   output and tenant overrides may not be represented; no fixture absence proves
   a selector or markup invalid.
-- Stylesheet discovery covers authored project CSS/SCSS, excluding documented
-  generated/dependency/hidden paths and symlinks. It does not follow asset links,
-  imports, partials or inline style blocks, or prove which files a page loads.
-- SCSS variables, mixins, interpolation and nesting are not evaluated. Dynamic
+- Fixture checks use the build's existing emitted CSS; source CSS/SCSS is checked
+  for authoring diagnostics. Static discovery cannot infer arbitrary executable
+  config, JavaScript CSS imports or code-split chunks; use explicit outputs.
+  Missing/stale artifacts, source maps and unresolved dependencies limit coverage.
+  Asset links, partials and inline style blocks are not expanded.
+- SCSS variables, mixins, interpolation and nesting are evaluated only by the
+  existing external build, never by validation. Dynamic
   pseudo classes, pseudo elements and namespaces are unsupported.
 - CMS syntax coverage is the verified Lex boundary/conditional profile only.
   Plugin parameter grammar, expression validity, PHP, specialty tags and runtime
@@ -119,7 +133,7 @@ locations identify each individual selector, including multiline lists.
 - Responsive support is inclusive pixel width/min-width/max-width queries with
   screen/all, optional only, and/comma lists and nesting. Other features, units,
   range syntax, negation and containers are unsupported.
-- CSS rules inspect authored declarations without resolving the final cascade,
+- CSS rules inspect emitted declarations without resolving the final cascade,
   shorthand equivalence, stylesheets' load order or browser layout. Intentional
   overrides and compensating declarations can account for reported warnings.
 - Resource limits intentionally reduce coverage for large projects. Every
@@ -153,3 +167,31 @@ button/pricing-table across all 17 loaded blocks, stdio legacy/structured output
 equality, unchanged contract tools, precise locations, warning/info validity,
 invalid-file boundaries, deterministic repeat calls, edit invalidation and
 read-only file snapshots. `git diff --check` passes.
+
+## Build-aware revision following Gourmet review
+
+Reviewed Gourmet's package scripts, Gruntfile and Webpack configuration, plus the
+development server's dev/compile implementation, before changing validation.
+Dev starts `grunt watch` without an initial asset build; compile handles HTML.
+Gourmet's existing Webpack pipeline emits `compiled/assets/css/style.css` and
+copies `src/css` assets. The validator reads those outputs and never runs builds.
+
+`css-assets.js` safely discovers static extracted/copied outputs or explicit
+non-Webpack paths. `css-source-maps.js` loads local/inline maps for original SCSS
+attribution, retains generated evidence and detects newer or differing inputs.
+Intermediate css-loader CSS snapshots under an SCSS URL are not mistaken for
+authoring changes. Missing/stale/unresolvable assets have PS-ASSET rule IDs and
+explicit coverage limitations. Plain CSS remains supported without Webpack.
+
+The temporary regression fixture uses the existing Webpack + Sass/css loaders
+and MiniCssExtractPlugin in test setup. Regression coverage includes nesting,
+imports, variables, resolved media, fixture selector matching, copied CSS,
+source-map fallback/attribution, freshness, plain CSS, other build tools and MCP.
+
+Build-aware revision acceptance: **74 tests pass, none pending**, with all 17
+local CMS exports enabled. Seventeen regressions exercise the Webpack fixture.
+Read-only Gourmet inspection selects the extracted `style.css` and copied
+`bootstrap-custom.css`, excludes the obsolete output, matches compiled selectors
+and maps usable SCSS positions. Its newer package.json produces possible-stale
+warnings; generated intermediate source-map snapshots do not produce false
+content-staleness claims. `git diff --check` passes. No Gourmet build was run.

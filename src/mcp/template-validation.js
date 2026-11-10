@@ -34,7 +34,7 @@ function validateTemplate(file, root = process.env.PAGESTUDIO_PROJECT_ROOT || pr
     'Browser rendering, visual correctness and the complete CSS cascade are not validated.',
     'The requested HTML source and discovered project stylesheets are checked; stylesheet loading, inline style blocks, linked external assets and HTML includes are not resolved.'
   ];
-  let analysis = { stylesheets: [], contracts: [], selectors: [], mediaQueries: [] };
+  let analysis = { stylesheets: [], sourceStylesheets: [], assets: { mode: 'unavailable', expected: [], artifacts: [] }, contracts: [], selectors: [], mediaQueries: [] };
   const add = (ruleId, severity, message) => findings.push({ ruleId, severity, file, message });
   const result = () => ({
     schemaVersion: '1.0',
@@ -75,7 +75,8 @@ function validateTemplate(file, root = process.env.PAGESTUDIO_PROJECT_ROOT || pr
       const responsive = analyzeResponsive(styles);
       findings.push(...syntax.findings, ...styles.findings, ...analyzeCompatibility(styles), ...responsive.findings);
       limitations.push(...syntax.limitations, ...styles.limitations, ...responsive.limitations);
-      analysis = { stylesheets: styles.stylesheets, contracts: styles.contracts, selectors: styles.selectors, mediaQueries: responsive.mediaQueries };
+      analysis = { stylesheets: styles.stylesheets, sourceStylesheets: styles.sourceStylesheets, assets: styles.assets,
+        contracts: styles.contracts, selectors: styles.selectors, mediaQueries: responsive.mediaQueries };
     }
   }
   return result();

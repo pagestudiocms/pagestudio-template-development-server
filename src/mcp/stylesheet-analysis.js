@@ -8,12 +8,13 @@ const selectorParser = require('postcss-selector-parser');
 const { parseDocument } = require('htmlparser2');
 const { compile, selectAll } = require('css-select');
 const { createBlockContractLoader, resolveContractsDirectory } = require('./block-contracts');
+const { discoverCssAssets, readLocal } = require('./css-assets');
+const { loadSourceMap, assessFreshness } = require('./css-source-maps');
 
 const MAX_BYTES = 1024 * 1024;
 const MAX_FILES = 500;
 const MAX_TOTAL_BYTES = 10 * MAX_BYTES;
 const MAX_SELECTORS = 5000;
-const IGNORED = new Set(['node_modules', 'vendor', 'build', 'dist', 'coverage']);
 // Only structural, static pseudo classes can be proven against an HTML snapshot.
 const STATIC_PSEUDOS = new Set([':is', ':where', ':not', ':has', ':root', ':empty',
   ':first-child', ':last-child', ':only-child', ':nth-child', ':nth-last-child',
@@ -60,27 +61,6 @@ function loadFixtures(base, limitations) {
   return fixtures;
 }
 
-function discoverStylesheets(base, limitations) {
-  const files = [];
-  let entries = 0;
-  function visit(directory) {
-    if (entries >= 10000 || files.length >= MAX_FILES) return;
-    let children;
-    try { children = fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0); }
-    catch (error) { limitations.push(`Cannot discover stylesheets in ${path.relative(base, directory) || '.'}: ${error.code}`); return; }
-    for (const child of children) {
-      if (++entries > 10000 || files.length >= MAX_FILES) break;
-      if (child.name.startsWith('.') || child.isSymbolicLink()) continue;
-      const filename = path.join(directory, child.name);
-      if (child.isDirectory() && !IGNORED.has(child.name)) visit(filename);
-      else if (child.isFile() && /\.(css|scss)$/i.test(child.name)) files.push(filename);
-    }
-  }
-  visit(base);
-  if (entries >= 10000 || files.length >= MAX_FILES) limitations.push('Stylesheet discovery stopped at 10,000 entries or 500 stylesheets.');
-  return files.sort();
-}
-
 function location(node) {
   return { line: node.source.start.line, column: node.source.start.column };
 }
@@ -96,16 +76,19 @@ function analyzeStylesheets(root) {
   const base = fs.realpathSync(root);
   const limitations = [
     'Unmatched selectors are observations, not invalid CSS: fixtures are finite HTML fragments.',
-    'Hidden directories, dependencies, build, dist, coverage and symlinks are excluded from stylesheet discovery.',
-    'SCSS is parsed without evaluation; imports, mixins, variables, interpolation and nested selectors are not expanded.',
+    'Source discovery excludes hidden/dependency/generated directories and symlinks; configured compiled CSS outputs are discovered separately.',
+    'SCSS source is parsed for authoring diagnostics only. Fixture matching, compatibility and responsive analysis use existing compiled or plain CSS; no build is run.',
     'Pseudo elements and dynamic pseudo classes are unsupported; browser layout and cascade are not validated.'
   ];
   const fixtures = loadFixtures(base, limitations);
   const selectors = [];
-  const findings = [];
-  const stylesheets = [];
-  let bytes = 0;
-  for (const filename of discoverStylesheets(base, limitations)) {
+  const assets = discoverCssAssets(base);
+  limitations.push(...assets.limitations);
+  const findings = [...assets.findings];
+  const stylesheets = [], sourceStylesheets = [], artifacts = [];
+  const runtime = new Set(assets.stylesheets);
+  let bytes = 0, sourceSelectorCount = 0, sourceConstructCount = 0;
+  for (const filename of [...new Set([...assets.sources, ...assets.stylesheets])]) {
     const file = path.relative(base, filename).split(path.sep).join('/');
     let ast;
     try {
@@ -115,11 +98,12 @@ function analyzeStylesheets(root) {
         continue;
       }
       bytes += size;
-      const source = fs.readFileSync(filename, 'utf8');
-      ast = path.extname(file).toLowerCase() === '.scss' ? scss.parse(source, { from: filename }) : postcss.parse(source, { from: filename });
+      const { text: source } = readLocal(base, filename);
+      // Handle maps ourselves so malformed maps never prevent CSS parsing.
+      ast = path.extname(file).toLowerCase() === '.scss' ? scss.parse(source, { from: filename, map: false }) : postcss.parse(source, { from: filename, map: false });
     } catch (error) {
-      if (error.code) {
-        limitations.push(`Skipped ${file}: stylesheet could not be read (${error.code}).`);
+      if (error.name !== 'CssSyntaxError') {
+        limitations.push(`Skipped ${file}: stylesheet could not be read (${error.code || error.message}).`);
         continue;
       }
       findings.push({ ruleId: 'PS-CSS-001', severity: 'error', file, line: error.line || null,
@@ -128,9 +112,31 @@ function analyzeStylesheets(root) {
         recommendation: 'Correct the stylesheet syntax and run validation again.' });
       continue;
     }
+    if (assets.sources.includes(filename)) {
+      const constructs = [], authoringSelectors = [];
+      ast.walkAtRules(node => {
+        if (['import', 'use', 'forward', 'include', 'mixin', 'media'].includes(node.name.toLowerCase()) && sourceConstructCount < MAX_SELECTORS) {
+          constructs.push({ name: '@' + node.name, params: node.params, ...location(node) }); sourceConstructCount++;
+        }
+      });
+      ast.walkRules(rule => {
+        if (sourceSelectorCount < MAX_SELECTORS) {
+          authoringSelectors.push({ selector: rule.selector, ...location(rule), status: 'authoring-only' }); sourceSelectorCount++;
+        }
+      });
+      sourceStylesheets.push({ file, syntax: path.extname(file).slice(1).toLowerCase(), constructs, selectors: authoringSelectors });
+    }
+    if (!runtime.has(filename)) continue;
     stylesheets.push(file);
+    const mapper = loadSourceMap(base, file, ast, limitations);
+    if (assets.mode === 'compiled') {
+      const freshness = assessFreshness(base, file, assets, mapper, limitations);
+      if (freshness.finding) findings.push(freshness.finding);
+      artifacts.push({ file, sourceMap: mapper.map, freshness: freshness.status });
+      if (!mapper.map) limitations.push(`${file}: no usable source map; SCSS attribution is unavailable.`);
+    }
     ast.walkAtRules(node => {
-      if (['import', 'use', 'forward', 'include'].includes(node.name.toLowerCase())) limitations.push(`${file}:${node.source.start.line}: @${node.name} is not resolved or executed.`);
+      if (node.name.toLowerCase() === 'import') limitations.push(`${file}:${node.source.start.line}: CSS @import is not followed.`);
     });
     ast.walkRules(rule => {
       if (selectors.length >= MAX_SELECTORS) {
@@ -155,7 +161,9 @@ function analyzeStylesheets(root) {
           media: ancestors.filter(node => node.type === 'atrule' && node.name.toLowerCase() === 'media').reverse().map(node => node.params),
           contexts: ancestors.filter(node => node.type === 'atrule' && node.name.toLowerCase() !== 'media').map(node => ({ name: node.name.toLowerCase(), params: node.params })),
           declarations: (rule.nodes || []).filter(node => node.type === 'decl').map(node => ({ property: node.prop.toLowerCase(), value: node.value,
-            important: Boolean(node.important), ...location(node) })) };
+            important: Boolean(node.important), ...location(node), original: mapper.original(location(node)) })) };
+        record.original = mapper.original(record);
+        record.sourceMap = mapper.map;
         const context = ancestors.some(node => node.type === 'rule' ||
           (node.type === 'atrule' && !['media', 'supports', 'layer', 'container', 'document', 'scope', 'starting-style'].includes(node.name.toLowerCase())));
         let unsupported = context;
@@ -185,7 +193,8 @@ function analyzeStylesheets(root) {
       }
     });
   }
-  return { stylesheets, contracts: fixtures.map(fixture => fixture.name), selectors, findings, limitations: [...new Set(limitations)] };
+  if (sourceSelectorCount >= MAX_SELECTORS || sourceConstructCount >= MAX_SELECTORS) limitations.push('Source authoring records are limited to 5,000 selectors and 5,000 constructs.');
+  return { stylesheets, sourceStylesheets, assets: { mode: assets.mode, expected: assets.expected, artifacts }, contracts: fixtures.map(fixture => fixture.name), selectors, findings, limitations: [...new Set(limitations)] };
 }
 
 module.exports = { analyzeStylesheets };

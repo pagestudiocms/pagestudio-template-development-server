@@ -1,6 +1,7 @@
 'use strict';
 
 const postcss = require('postcss');
+const { findingLocation, mappingEvidence } = require('./diagnostics');
 
 const RULES = Object.freeze({
   HIDDEN_CONTENT: 'PS-CSS-101',
@@ -29,9 +30,9 @@ function analyzeCompatibility(analysis) {
       for (const declaration of record.declarations) {
         const value = declaration.value.trim().toLowerCase();
         const add = (ruleId, severity, message, evidence, explanation, recommendation) => findings.push({
-          ruleId, severity, file: record.file, line: declaration.line, column: declaration.column,
+          ruleId, severity, ...findingLocation(record, declaration),
           selector: record.selector, block: match.block, message, evidence: {
-            fixture: match.fixture, elements: match.evidence, declaration, media: record.media, ...evidence
+            fixture: match.fixture, elements: match.evidence, declaration, media: record.media, ...mappingEvidence(record, declaration), ...evidence
           }, explanation, recommendation
         });
         if ((declaration.property === 'display' && value === 'none') ||

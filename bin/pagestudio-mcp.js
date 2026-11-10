@@ -23,7 +23,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     }
   }, {
     name: 'pagestudio_validate_template',
-    description: 'Read-only offline validation of project HTML syntax and discovered CSS/SCSS against CMS fixtures, with bounded responsive risks, structured findings and explicit limitations.',
+    description: 'Read-only offline HTML and CSS/SCSS authoring validation; matches existing build-produced or plain CSS to CMS fixtures, with source-map attribution, asset freshness, bounded responsive risks and explicit limitations.',
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     inputSchema: {
       type: 'object',

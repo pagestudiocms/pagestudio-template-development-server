@@ -18,9 +18,26 @@ that may be intentional. Fixture absence never proves markup invalid.
 
 Use PostCSS/postcss-scss for source, postcss-selector-parser for selectors,
 htmlparser2/css-select for fixture DOM queries, and media-query/value parsers for
-bounded responsive analysis. No Sass evaluation or browser dependency is needed.
+bounded responsive analysis. CSS fixture/compatibility/responsive inputs are the
+existing artifacts produced by the template's own build, or authored plain CSS.
+SCSS source is checked separately for authoring syntax. No Sass evaluation or
+browser dependency is needed in validation. The existing asset pipeline remains
+responsible for resolving imports, nesting, variables and media output.
 Use per-call manifest/DOM/inline-style/media caches with explicit discovery and
 size limits; avoid persistent caches that can return stale project content.
+
+Discover static Webpack/MiniCssExtractPlugin/CopyWebpackPlugin outputs with Acorn;
+never require or execute project configuration. Support explicit local output
+paths for other/dynamic build tools and conventional output fallback where needed.
+Use trace-mapping to attribute generated findings to local SCSS and retain emitted
+locations in evidence. Missing/invalid/synthetic source-map entries fall back to
+generated locations. Missing or possibly stale assets are explicit warnings and
+limitations; timestamps alone cannot prove staleness or freshness.
+
+The [Gourmet configuration review](../css-build-validation.md) establishes that
+dev starts a Grunt watcher without an initial asset build and compile processes
+HTML only. Validation never runs a build to compensate. No redundant Sass pipeline
+is added; tests use the existing Webpack loader toolchain in temporary fixtures.
 
 Apply the [tested rule catalog](../validation-rules.md). Unmatched selectors are
 observations, unsupported selectors/contexts reduce coverage, and ordinary CSS
@@ -52,12 +69,14 @@ Only errors affect `valid`. Validation never modifies templates.
 ## Limitations
 
 Finite fragment fixtures cannot enumerate all CMS markup. Asset loading, imports,
-SCSS expansion, inline style blocks, final cascade, dynamic state and browser
+runtime SCSS expansion, inline style blocks, final cascade, dynamic state and browser
 layout are not resolved. Media support is restricted to inclusive pixel width
 queries; other conditions are limitations. Syntax checks validate known Lex
 boundaries and conditional structure, not plugin parameters, PHP expression
 grammar or data-dependent loops. Full HTML conformance is outside this profile.
 See the [phase report](../contract-aware-validation.md) for bounds and validation.
+CSS source maps and build outputs may be incomplete or stale; declared outputs
+are needed for unsupported configuration and code-split/imported-JavaScript CSS.
 
 ## Related
 

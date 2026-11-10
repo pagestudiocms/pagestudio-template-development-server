@@ -26,4 +26,13 @@ function normalizeFinding(finding) {
   };
 }
 
-module.exports = { normalizeFinding };
+function findingLocation(record, declaration) {
+  return declaration.original || { file: record.file, line: declaration.line, column: declaration.column };
+}
+
+function mappingEvidence(record, declaration) {
+  return declaration.original ? { generated: { file: record.file, line: declaration.line, column: declaration.column },
+    original: declaration.original, sourceMap: record.sourceMap } : {};
+}
+
+module.exports = { normalizeFinding, findingLocation, mappingEvidence };

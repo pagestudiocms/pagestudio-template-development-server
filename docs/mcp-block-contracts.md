@@ -37,12 +37,18 @@ matching, conservative styling rules and bounded responsive risks.
 
 Validation never modifies files, compiles SCSS, invokes plugins, contacts tenants
 or launches a browser. Missing/incomplete contracts reduce coverage and produce
-limitations. Unmatched selectors are observations. All discovered project
-stylesheets are checked; which assets the selected page loads is not established.
+limitations. Unmatched selectors are observations. Fixture compatibility and
+responsive checks use emitted CSS discovered from the existing build configuration,
+or authored CSS in plain-CSS projects. CSS/SCSS source remains available for
+authoring diagnostics; which assets the selected page loads is not established.
+The validator never executes build scripts or JavaScript configuration. Gourmet's
+`dev` starts an asset watcher without an initial asset build; `compile` processes
+HTML only. Missing/stale CSS requires a manual run of the existing asset build.
 
 Responses retain `schemaVersion: "1.0"`, `file`, `valid`, `findings`, `limitations`
 and JSON text for existing clients. Additive `analysis` contains `stylesheets`,
-loaded `contracts`, selector records and parsed `mediaQueries`. The same object
+`sourceStylesheets` (authoring-only records), `assets` (expected outputs, source maps,
+freshness), loaded `contracts`, selector records and parsed `mediaQueries`. The same object
 is returned in MCP `structuredContent`. Only errors make `valid` false; warnings
 and `info` do not prove incompatibility.
 
@@ -71,10 +77,15 @@ Every finding has these fields (locations/context may be `null`):
 Selector statuses are `matched`, `unmatched`, `unsupported`. Matching evidence
 contains the CMS block, fixture file, count and up to three element samples.
 No match means only no loaded fixture matched. Fragment boundaries, dynamic
-state, unresolved SCSS and unsupported media features limit coverage.
+state, unavailable/stale compiled CSS and unsupported media features limit coverage.
+Mapped findings identify SCSS locations when available and keep generated positions
+in evidence. Invalid maps fall back to CSS locations. Plain CSS needs no Webpack;
+other/dynamic builds can declare local css.outputs in `.pagestudio/validation.json`.
 
 See the [rule catalog](validation-rules.md), [verified syntax](template-syntax.md)
 and [implementation phases and limitations](contract-aware-validation.md).
+See [existing build discovery, timing, source maps and freshness](css-build-validation.md)
+for the Gourmet configuration review and non-Webpack configuration examples.
 
 For VS Code, configure the MCP server in the template project's `.vscode/mcp.json`:
 
