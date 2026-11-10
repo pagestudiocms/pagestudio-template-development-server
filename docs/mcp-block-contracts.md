@@ -29,6 +29,26 @@ The manifest must use `schemaVersion: "1.0"` and `renderer: "cms-built-in"`. Thi
 
 ## Preliminary template validation
 
-`pagestudio_validate_template({ "file": "example/html/layouts/default.html" })` checks a project-relative HTML file against the MCP process working directory. The tool returns `schemaVersion`, `valid`, `findings` (with rule IDs, severity, file and message), and explicit `limitations`.
+`pagestudio_validate_template({ "file": "example/html/layouts/default.html" })` checks a project-relative HTML file against `PAGESTUDIO_PROJECT_ROOT`, falling back to the MCP process working directory. The tool returns `schemaVersion`, `valid`, `findings` (with rule IDs, severity, file and message), and explicit `limitations`.
 
-This first increment checks existence, regular-file status, extension, empty content, a 1 MiB size limit, and project-root containment (including symlink resolution). It does **not** parse PageStudio syntax or validate CMS DOM/CSS compatibility yet. Validation never modifies files. Start the MCP process with the template project as its working directory.
+This first increment checks existence, regular-file status, extension, empty content, a 1 MiB size limit, and project-root containment (including symlink resolution). It does **not** parse PageStudio syntax or validate CMS DOM/CSS compatibility yet. Validation never modifies files. Set `PAGESTUDIO_PROJECT_ROOT` to the absolute path of the template project. If unset, the MCP process working directory is used.
+
+For VS Code, configure the MCP server in the template project's `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "pagestudio": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/absolute/path/to/pagestudio-template-development-server/bin/pagestudio-mcp.js"],
+      "env": {
+        "PAGESTUDIO_PROJECT_ROOT": "/absolute/path/to/template-project",
+        "PAGESTUDIO_BLOCK_CONTRACTS_DIR": "/absolute/path/to/block-contracts"
+      }
+    }
+  }
+}
+```
+
+The MCP server executable may be installed elsewhere; the project root selects the files to validate. The fixture directory independently selects the CMS contract bundle.
