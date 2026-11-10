@@ -10,7 +10,8 @@
   },
   "main": "src/compiler/index.js",
   "bin": {
-    "pagestudio": "./bin/pagestudio.js"
+    "pagestudio": "./bin/pagestudio.js",
+    "pagestudio-mcp": "./bin/pagestudio-mcp.js"
   },
   "dependencies": {
     "chai": "^4.3.8",
