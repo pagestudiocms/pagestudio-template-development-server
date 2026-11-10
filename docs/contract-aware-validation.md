@@ -33,3 +33,19 @@ Phase 1 review: selector/discovery tests pass (7); full suite passes (30, with
 one optional external-bundle test pending). MCP child-process tests require the
 execution environment to permit stdio pipes; they pass outside the restricted
 sandbox. No compiler or MCP behavior has changed in this phase.
+
+## Phase 2: CSS compatibility rules
+
+`css-compatibility.js` applies the [rule catalog](validation-rules.md) only to
+selectors matching successful CMS fixture elements. It reports hidden-content
+and broad-reset risks as warnings and inline-important interactions as info.
+Each finding includes source/declaration location, selector, block, fixture
+evidence, explanation and recommendation. Ordinary overrides are accepted.
+Inline CSS parsing is cached within each call, never across project edits.
+
+The checks do not model the cascade or demand CMS visual defaults. Only parser
+errors are CSS errors. Each compatibility rule has positive and negative tests.
+
+Phase 2 review: six compatibility-rule tests and all 36 regression tests pass;
+one optional external-bundle test is pending. All three compatibility rules have
+positive and negative cases. No contract-dependent error rule was invented.
