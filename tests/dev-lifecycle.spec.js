@@ -28,5 +28,10 @@ describe('Serialized dev build lifecycle',function(){
   watcher.emit('all','change',path.join(root,'package.json'));assert.equal(getBuildStatus(root).state,'failed');assert.equal(getBuildStatus(root).ready,false);
  });
  it('stops an active build, closes the watcher and invalidates the status owner',async()=>{const started=dev.start();await until(()=>calls.length===1);await dev.stop();await started;assert.equal(stopped,true);assert.equal(getBuildStatus(root).state,'unavailable');assert.deepEqual(calls,['assets']);});
+ it('invalidates ready immediately while keeping ownership through child teardown',async()=>{
+  await initial();let finish;dev.children.stop=()=>new Promise(resolve=>{finish=resolve;});
+  const closing=dev.stop();assert.equal(getBuildStatus(root).ready,false);assert.equal(getBuildStatus(root).phase,'shutdown');
+  assert.ok(fs.existsSync(path.join(root,'.pagestudio/dev.lock')));finish();await closing;assert.equal(getBuildStatus(root).state,'unavailable');
+ });
  it('makes watcher failure fatal and cleans up children',async()=>{await initial();const previous=process.exitCode;watcher.emit('error',new Error('watch failed'));await dev.stop();process.exitCode=previous;assert.equal(stopped,true);assert.equal(getBuildStatus(root).state,'unavailable');assert.equal(getBuildStatus(root).lastFailure.phase,'watcher');});
 });

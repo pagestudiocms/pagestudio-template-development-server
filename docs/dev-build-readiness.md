@@ -128,3 +128,9 @@ and the existing Grunt/Webpack/Sass toolchain. Coverage includes initial builds,
 all input types, rapid edits, failure/recovery, status/restarts, duplicate owners,
 preview bind failure, active-build shutdown and custom/HTML-only projects. No real
 Gourmet files or outputs are modified, and no project code executes inside MCP.
+
+Final verification: 103 tests pass with no pending tests, including all 17 local
+CMS fixtures. This includes 12 real-process lifecycle cases and explicit tests
+for immediate shutdown invalidation, dead-owner recovery and partial publications.
+`git diff --check` passes. The tests build only temporary projects; Gourmet's
+working files and existing output are preserved.

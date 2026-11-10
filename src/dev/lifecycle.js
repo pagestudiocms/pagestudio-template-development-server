@@ -75,7 +75,7 @@ class DevLifecycle {
     this.preview = this.children.spawn(process.execPath, [CLI, 'server', '--root', this.config.out, '--watch', this.config.out,
       '--host', this.config.host, '--port', String(this.config.port), '--open', this.config.open], {
       cwd: this.root, env: { ...process.env, PAGESTUDIO_DEV_CHILD: '1' }, stdio: ['inherit', 'inherit', 'inherit', 'ipc'] });
-    await new Promise((resolve, reject) => {
+    try { await new Promise((resolve, reject) => {
       let settled = false;
       const timeout = setTimeout(() => done(new Error('Preview startup timed out')), 15000);
       const done = error => { if (settled) return; settled = true; clearTimeout(timeout); error ? reject(error) : resolve(); };
@@ -85,7 +85,7 @@ class DevLifecycle {
       });
       this.preview.once('error', error => { done(error); this.fatal('preview', error); });
       this.preview.once('close', () => { done(new Error('Preview exited')); if (!this.stopped) this.fatal('preview'); });
-    });
+    }); } catch (error) { this.fatal('preview', error); }
   }
   async drain() {
     if (this.running || this.stopped || this.restartRequired || !this.pending.size) return;
@@ -108,6 +108,7 @@ class DevLifecycle {
           if (fs.existsSync(this.config.configFile)) args.push('--config', this.config.configFile);
           await this.build('html', process.execPath, args);
         }
+        if (this.restartRequired && !this.stopped) { this.publish({ state: 'failed', activeGeneration: null, phase: 'startup' }); break; }
         if (!this.stopped) await this.startPreview();
         if (this.stopped) break;
         if (this.restartRequired) { this.publish({ state: 'failed', activeGeneration: null, phase: 'startup' }); break; }
