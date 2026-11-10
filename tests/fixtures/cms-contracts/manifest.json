@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "1.0",
+  "renderer": "cms-built-in",
+  "blocks": {
+    "button": {
+      "config": {
+        "name": "button",
+        "type": "button",
+        "group": "components",
+        "order": 1,
+        "label": "Button",
+        "assets": {
+          "css": [],
+          "js": []
+        }
+      },
+      "hasSampleData": true,
+      "hasBuiltinRenderer": true,
+      "renderer": {
+        "type": "custom",
+        "class": "Button_Portlet"
+      },
+      "fixtureStatus": "rendered"
+    },
+    "text-heading": {
+      "config": {
+        "name": "text-heading",
+        "type": "text-heading",
+        "group": "text",
+        "order": 1,
+        "label": "Text",
+        "assets": {
+          "css": [],
+          "js": []
+        }
+      },
+      "hasSampleData": true,
+      "hasBuiltinRenderer": true,
+      "renderer": {
+        "type": "custom",
+        "class": "Text_Heading_Portlet"
+      },
+      "fixtureStatus": "rendered"
+    },
+    "pricing-table": {
+      "config": {
+        "name": "pricing-table",
+        "type": "pricing-table",
+        "group": "components",
+        "order": 5,
+        "label": "Pricing Table",
+        "assets": {
+          "css": [
+            "css/pricing-table-portlet.css",
+            "assets/vendors/animate/3.5.1/animate.min.css"
+          ],
+          "js": [
+            "assets/vendors/wow/1.1.0/dist/wow.min.js",
+            "assets/vendors/wow/1.1.0/wow-init.js"
+          ]
+        }
+      },
+      "hasSampleData": true,
+      "hasBuiltinRenderer": true,
+      "renderer": {
+        "type": "custom",
+        "class": "Pricing_Table_Portlet"
+      },
+      "fixtureStatus": "rendered"
+    }
+  },
+  "fixtures": [
+    {
+      "name": "button",
+      "status": "rendered",
+      "input": "block-button.json",
+      "html": "block-button.html"
+    },
+    {
+      "name": "pricing-table",
+      "status": "rendered",
+      "input": "block-pricing-table.json",
+      "html": "block-pricing-table.html"
+    },
+    {
+      "name": "text-heading",
+      "status": "rendered",
+      "input": "block-text-heading.json",
+      "html": "block-text-heading.html"
+    }
+  ]
+}

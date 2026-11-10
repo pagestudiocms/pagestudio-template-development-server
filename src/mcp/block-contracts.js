@@ -3,11 +3,20 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-function loadBlockContract(name, directory) {
+function resolveContractsDirectory(directory) {
+  if (directory) return path.resolve(directory);
+  if (process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR) return path.resolve(process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR);
+  return path.resolve(process.env.PAGESTUDIO_PROJECT_ROOT || process.cwd(), '.pagestudio', 'contracts');
+}
+
+function validateBlockName(name) {
   if (typeof name !== 'string' || !/^[a-z0-9-]+$/.test(name)) {
     throw new Error('block name must contain only lowercase letters, digits and hyphens');
   }
-  const root = path.resolve(directory || process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR || path.join(process.cwd(), 'block-contracts'));
+}
+
+function createBlockContractLoader(directory) {
+  const root = resolveContractsDirectory(directory);
   const readFile = (filename) => {
     try {
       return fs.readFileSync(path.join(root, filename), 'utf8');
@@ -22,6 +31,11 @@ function loadBlockContract(name, directory) {
   if (manifest.schemaVersion !== '1.0' || manifest.renderer !== 'cms-built-in') {
     throw new Error('Unsupported block contract manifest version or renderer');
   }
+  return { manifest, load: name => readBlockContract(name, manifest, readFile) };
+}
+
+function readBlockContract(name, manifest, readFile) {
+  validateBlockName(name);
   const block = manifest.blocks && Object.prototype.hasOwnProperty.call(manifest.blocks, name) ? manifest.blocks[name] : null;
   if (!block) throw new Error('Unknown or disabled PageStudio block: ' + name);
   const fixture = (manifest.fixtures || []).find(item => item.name === name);
@@ -49,4 +63,9 @@ function loadBlockContract(name, directory) {
   };
 }
 
-module.exports = { loadBlockContract };
+function loadBlockContract(name, directory) {
+  validateBlockName(name);
+  return createBlockContractLoader(directory).load(name);
+}
+
+module.exports = { loadBlockContract, resolveContractsDirectory, createBlockContractLoader };

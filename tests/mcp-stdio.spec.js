@@ -22,11 +22,13 @@ describe('MCP stdio protocol', function () {
     }));
     fs.writeFileSync(path.join(root, 'block-button.json'), '[{"id":"fixed"}]');
     fs.writeFileSync(path.join(root, 'block-button.html'), '<a class="btn">Button text</a>');
+    fs.writeFileSync(path.join(root, 'index.html'), '{{ if active }}\n<a>Example</a>');
+    fs.writeFileSync(path.join(root, 'site.css'), '@media (max-width:600px) { .btn {display:none; min-width:900px} }');
     client = new Client({ name: 'pagestudio-mcp-test', version: '1.0.0' });
     transport = new StdioClientTransport({
       command: process.execPath,
       args: [path.resolve(__dirname, '../bin/pagestudio-mcp.js')],
-      env: { ...process.env, PAGESTUDIO_BLOCK_CONTRACTS_DIR: root },
+      env: { ...process.env, PAGESTUDIO_BLOCK_CONTRACTS_DIR: root, PAGESTUDIO_PROJECT_ROOT: root },
       stderr: 'pipe'
     });
     await client.connect(transport);
@@ -48,5 +50,26 @@ describe('MCP stdio protocol', function () {
     const result = await client.callTool({ name: 'pagestudio_get_block_contract', arguments: { name: 'navbar' } });
     assert.equal(result.isError, true);
     assert.match(result.content[0].text, /Unknown or disabled/);
+  });
+  it('advertises read-only validation and returns consistent structured findings plus legacy JSON text', async function () {
+    const tools = await client.listTools();
+    const tool = tools.tools.find(item => item.name === 'pagestudio_validate_template');
+    assert.equal(tool.annotations.readOnlyHint, true);
+    const before = fs.readFileSync(path.join(root, 'site.css'));
+    const result = await client.callTool({ name: tool.name, arguments: { file: 'index.html' } });
+    const data = JSON.parse(result.content[0].text);
+    assert.deepEqual(result.structuredContent, data);
+    assert.equal(data.schemaVersion, '1.0'); assert.equal(data.valid, false);
+    assert.ok(data.findings.some(item => item.ruleId === 'PS-SYN-002'));
+    assert.ok(data.findings.some(item => item.ruleId === 'PS-CSS-101'));
+    assert.ok(data.findings.some(item => item.ruleId === 'PS-RESP-001'));
+    assert.equal(data.analysis.selectors[0].matches[0].block, 'button');
+    assert.deepEqual(fs.readFileSync(path.join(root, 'site.css')), before);
+    assert.deepEqual(await client.callTool({ name: tool.name, arguments: { file: 'index.html' } }), result);
+  });
+  it('returns traversal errors and continues servicing contract requests', async function () {
+    const result = await client.callTool({ name: 'pagestudio_validate_template', arguments: { file: '../outside.html' } });
+    assert.equal(result.isError, true);
+    assert.equal((await client.callTool({ name: 'pagestudio_get_block_contract', arguments: { name: 'button' } })).isError, undefined);
   });
 });

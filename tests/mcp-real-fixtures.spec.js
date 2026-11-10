@@ -3,7 +3,9 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 const { loadBlockContract } = require('../src/mcp/block-contracts');
+const { analyzeStylesheets } = require('../src/mcp/stylesheet-analysis');
 
 describe('real CMS fixture bundle (optional)', function () {
   const directory = process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR;
@@ -23,5 +25,16 @@ describe('real CMS fixture bundle (optional)', function () {
     const pricing = loadBlockContract('pricing-table', directory);
     assert.match(pricing.fixture.html, /Starter/);
     assert.match(pricing.fixture.html, /Buy it now/);
+  });
+  it('matches authored selectors against the complete real CMS export offline', function () {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ps-real-css-'));
+    try {
+      fs.writeFileSync(path.join(root, 'site.css'), '.text-left > a.btn {color:red} .bhb-pricing-table .price strong {color:blue}');
+      const result = analyzeStylesheets(root);
+      assert.equal(result.contracts.length, 17);
+      assert.ok(result.selectors[0].matches.some(item => item.block === 'button'));
+      assert.ok(result.selectors[1].matches.some(item => item.block === 'pricing-table'));
+      assert.deepEqual(result.findings, []);
+    } finally { fs.rmSync(root, {recursive:true, force:true}); }
   });
 });
