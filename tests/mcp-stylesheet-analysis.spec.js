@@ -38,6 +38,10 @@ describe('Contract-aware stylesheet discovery and matching', function () {
     assert.ok(result.limitations.some(item => item.includes('@use')));
     assert.ok(!result.selectors.some(item => item.selector === 'from'));
   });
+  it('reports each selector location within multiline lists', function () {
+    write(root, 'site.css', '\n.a,\n  h1[style], .btn {color:red}');
+    assert.deepEqual(analyzeStylesheets(root).selectors.map(item => [item.line, item.column]), [[2,1], [3,3], [3,14]]);
+  });
   it('skips dependencies, generated files, hidden paths and symlinks', function () {
     for (const dir of ['node_modules', 'build', 'dist', 'vendor', '.hidden']) write(root, dir + '/ignore.css', '.btn{}');
     write(root, 'a.css', '.btn{}'); fs.symlinkSync(path.join(root, 'a.css'), path.join(root, 'link.css'));

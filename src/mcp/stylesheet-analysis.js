@@ -6,12 +6,13 @@ const postcss = require('postcss');
 const scss = require('postcss-scss');
 const selectorParser = require('postcss-selector-parser');
 const { parseDocument } = require('htmlparser2');
-const { selectAll } = require('css-select');
-const { loadBlockContract, resolveContractsDirectory } = require('./block-contracts');
+const { compile, selectAll } = require('css-select');
+const { createBlockContractLoader, resolveContractsDirectory } = require('./block-contracts');
 
 const MAX_BYTES = 1024 * 1024;
 const MAX_FILES = 500;
 const MAX_TOTAL_BYTES = 10 * MAX_BYTES;
+const MAX_SELECTORS = 5000;
 const IGNORED = new Set(['node_modules', 'vendor', 'build', 'dist', 'coverage']);
 // Only structural, static pseudo classes can be proven against an HTML snapshot.
 const STATIC_PSEUDOS = new Set([':is', ':where', ':not', ':has', ':root', ':empty',
@@ -21,11 +22,12 @@ const STATIC_PSEUDOS = new Set([':is', ':where', ':not', ':has', ':root', ':empt
 function loadFixtures(base, limitations) {
   const directory = process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR
     ? resolveContractsDirectory() : path.join(base, '.pagestudio', 'contracts');
-  let manifest;
+  let manifest, loader;
   try {
     const filename = path.join(directory, 'manifest.json');
     if (fs.statSync(filename).size > MAX_BYTES) throw new Error('Manifest exceeds 1 MiB');
-    manifest = JSON.parse(fs.readFileSync(filename, 'utf8'));
+    loader = createBlockContractLoader(directory);
+    manifest = loader.manifest;
     if (manifest.schemaVersion !== '1.0' || manifest.renderer !== 'cms-built-in' ||
         !manifest.blocks || typeof manifest.blocks !== 'object' || Array.isArray(manifest.blocks) ||
         !Array.isArray(manifest.fixtures)) throw new Error('Unsupported or incomplete contract manifest');
@@ -47,7 +49,7 @@ function loadFixtures(base, limitations) {
         bytes += stat.size;
       }
       if (bytes > MAX_TOTAL_BYTES) throw new Error('Contract fixtures exceed 10 MiB analysis budget');
-      const contract = loadBlockContract(name, directory);
+      const contract = loader.load(name);
       if (!contract.fixture.html.trim()) throw new Error('Empty rendered fixture');
       fixtures.push({ name, file: `block-${name}.html`, dom: parseDocument(contract.fixture.html) });
     } catch (error) {
@@ -83,6 +85,13 @@ function location(node) {
   return { line: node.source.start.line, column: node.source.start.column };
 }
 
+function selectorLocation(rule, selector) {
+  const relative = selector.first && selector.first.source.start;
+  if (!relative) return location(rule);
+  return { line: rule.source.start.line + relative.line - 1,
+    column: relative.line === 1 ? rule.source.start.column + relative.column - 1 : relative.column };
+}
+
 function analyzeStylesheets(root) {
   const base = fs.realpathSync(root);
   const limitations = [
@@ -109,6 +118,10 @@ function analyzeStylesheets(root) {
       const source = fs.readFileSync(filename, 'utf8');
       ast = path.extname(file).toLowerCase() === '.scss' ? scss.parse(source, { from: filename }) : postcss.parse(source, { from: filename });
     } catch (error) {
+      if (error.code) {
+        limitations.push(`Skipped ${file}: stylesheet could not be read (${error.code}).`);
+        continue;
+      }
       findings.push({ ruleId: 'PS-CSS-001', severity: 'error', file, line: error.line || null,
         column: error.column || null, message: 'Stylesheet could not be parsed.', evidence: error.reason || error.message,
         explanation: 'The stylesheet parser rejected this source; compatibility analysis for this file is unavailable.',
@@ -120,6 +133,10 @@ function analyzeStylesheets(root) {
       if (['import', 'use', 'forward', 'include'].includes(node.name.toLowerCase())) limitations.push(`${file}:${node.source.start.line}: @${node.name} is not resolved or executed.`);
     });
     ast.walkRules(rule => {
+      if (selectors.length >= MAX_SELECTORS) {
+        limitations.push('Selector analysis stopped at 5,000 records.');
+        return false;
+      }
       const ancestors = [];
       for (let parent = rule.parent; parent && parent.type !== 'root'; parent = parent.parent) ancestors.push(parent);
       if (ancestors.some(node => node.type === 'atrule' && /keyframes$/i.test(node.name))) return;
@@ -130,7 +147,11 @@ function analyzeStylesheets(root) {
         return;
       }
       for (const selector of parsed.nodes) {
-        const record = { file, ...location(rule), selector: selector.toString().trim(), status: 'unmatched', matches: [],
+        if (selectors.length >= MAX_SELECTORS) {
+          limitations.push('Selector analysis stopped at 5,000 records.');
+          break;
+        }
+        const record = { file, ...selectorLocation(rule, selector), selector: selector.toString().trim(), status: 'unmatched', matches: [],
           media: ancestors.filter(node => node.type === 'atrule' && node.name.toLowerCase() === 'media').reverse().map(node => node.params),
           contexts: ancestors.filter(node => node.type === 'atrule' && node.name.toLowerCase() !== 'media').map(node => ({ name: node.name.toLowerCase(), params: node.params })),
           declarations: (rule.nodes || []).filter(node => node.type === 'decl').map(node => ({ property: node.prop.toLowerCase(), value: node.value,
@@ -148,13 +169,13 @@ function analyzeStylesheets(root) {
           record.reason = 'Selector requires dynamic state, namespace, pseudo element, nesting or SCSS evaluation.';
         } else {
           try {
+            // Compile once per source selector, then reuse against every fixture DOM.
+            const query = compile(record.selector, { xmlMode: false });
             for (const fixture of fixtures) {
-              const elements = selectAll(record.selector, fixture.dom, { xmlMode: false });
+              const elements = selectAll(query, fixture.dom, { xmlMode: false });
               if (elements.length) record.matches.push({ block: fixture.name, fixture: fixture.file, count: elements.length,
                 evidence: elements.slice(0, 3).map(element => ({ tag: element.name, attributes: { ...element.attribs } })) });
             }
-            // Validate selector engine support even when no fixtures are available.
-            if (!fixtures.length) selectAll(record.selector, parseDocument(''));
             if (record.matches.length) record.status = 'matched';
           } catch (error) {
             record.status = 'unsupported'; record.matches = []; record.reason = error.message;

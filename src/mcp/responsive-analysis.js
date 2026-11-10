@@ -80,7 +80,11 @@ function analyzeResponsive(analysis) {
       }
       const parsed = cache.get(query);
       if (parsed === null) supported = false;
-      else intervals = intersect(intervals, parsed).slice(0, 64);
+      else {
+        const combined = intersect(intervals, parsed);
+        if (combined.length > 64) limitations.push(`${record.file}:${record.line}: nested media intersection truncated to 64 ranges.`);
+        intervals = combined.slice(0, 64);
+      }
     }
     if (!supported) {
       limitations.push(`${record.file}:${record.line}: responsive context is unsupported: ${record.media.join(' AND ')}.`);

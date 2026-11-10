@@ -84,3 +84,72 @@ Phase 4 review: seven responsive tests and all 49 regression tests pass; one
 optional external-bundle test remains pending. Coverage includes exact inclusive
 breakpoints, media lists, nested/disjoint ranges, intentional overrides and
 unsupported media features. All responsive findings are warnings.
+
+## Phase 5: actionable MCP diagnostics
+
+The unchanged `{file}` tool input now runs all analyzers. Responses preserve
+schema version 1.0 and legacy JSON text and add identical MCP structuredContent.
+Every finding has ruleId, severity, file, nullable line/column/selector/construct/
+block, message, evidence, explanation and recommendation. Only errors affect
+validity. Analysis records describe stylesheet files, loaded blocks, selector
+statuses/evidence and supported/unsupported media queries.
+
+Existing file-level checks remain in place, including containment, symlinks,
+regular-file status and the 1 MiB HTML limit. Missing contracts reduce coverage;
+invalid CSS files do not prevent analysis of other files. MCP advertises
+read-only, non-destructive, idempotent, closed-world annotations. Manifest, DOM,
+inline-style and media-query caches are scoped to a call; edits cannot leave
+persistent cached findings. Selector output is bounded to 5,000 records.
+Compiled selector queries are also reused across fixture DOMs. Selector-list
+locations identify each individual selector, including multiline lists.
+
+## Unresolved limitations
+
+- Fixtures are finite fragments. Ancestors, sibling variants, alternate CMS
+  output and tenant overrides may not be represented; no fixture absence proves
+  a selector or markup invalid.
+- Stylesheet discovery covers authored project CSS/SCSS, excluding documented
+  generated/dependency/hidden paths and symlinks. It does not follow asset links,
+  imports, partials or inline style blocks, or prove which files a page loads.
+- SCSS variables, mixins, interpolation and nesting are not evaluated. Dynamic
+  pseudo classes, pseudo elements and namespaces are unsupported.
+- CMS syntax coverage is the verified Lex boundary/conditional profile only.
+  Plugin parameter grammar, expression validity, PHP, specialty tags and runtime
+  data/loop behavior remain unchecked. Full HTML conformance is outside scope.
+- Responsive support is inclusive pixel width/min-width/max-width queries with
+  screen/all, optional only, and/comma lists and nesting. Other features, units,
+  range syntax, negation and containers are unsupported.
+- CSS rules inspect authored declarations without resolving the final cascade,
+  shorthand equivalence, stylesheets' load order or browser layout. Intentional
+  overrides and compensating declarations can account for reported warnings.
+- Resource limits intentionally reduce coverage for large projects. Every
+  reached limit/skipped input is reported. No claim of visual correctness is made.
+
+## Phase commits and validation
+
+| Phase | Commit | Validation at phase completion |
+| --- | --- | --- |
+| 1: discovery/matching | `5a62741` | 7 focused tests; 30 total passed |
+| 2: CSS rules/catalog | `ec5dd83` | 6 focused tests; 36 total passed |
+| 3: verified Lex syntax | `bb989a9` | 6 focused tests; 42 total passed |
+| 4: responsive analysis | `f00103f` | 7 focused tests; 49 total passed |
+| 5: MCP integration | final phase commit | stdio, diagnostics, file boundaries, read-only and full real-bundle tests |
+
+The first four normal suite runs each left one optional external-bundle test
+pending. The final suite also runs with PAGESTUDIO_BLOCK_CONTRACTS_DIR pointing
+to the local CMS export, exercising all 17 blocks and selector matching offline.
+Tests require no tenant credentials or PHP process. MCP child-process tests need
+working stdio pipes, which this execution sandbox restricts; the same suite is
+run with those restrictions lifted.
+
+The feature branch starts at `3b391c0`, the fetched latest
+`feat/mcp-template-validation`. Its changes are not present in fetched `main`
+(`e27f6dc`); the PR targets the implementation branch to avoid duplicating its
+unmerged work. Retarget to main when that dependency is merged.
+
+Phase 5 review: final acceptance run passes **57 tests with no pending tests**
+using the complete local CMS export. This includes actual selector matching for
+button/pricing-table across all 17 loaded blocks, stdio legacy/structured output
+equality, unchanged contract tools, precise locations, warning/info validity,
+invalid-file boundaries, deterministic repeat calls, edit invalidation and
+read-only file snapshots. `git diff --check` passes.

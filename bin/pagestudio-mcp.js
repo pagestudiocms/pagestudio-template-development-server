@@ -23,7 +23,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     }
   }, {
     name: 'pagestudio_validate_template',
-    description: 'Perform read-only, deterministic preliminary validation of a project HTML template; returns structured findings and coverage limitations.',
+    description: 'Read-only offline validation of project HTML syntax and discovered CSS/SCSS against CMS fixtures, with bounded responsive risks, structured findings and explicit limitations.',
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     inputSchema: {
       type: 'object',
       properties: { file: { type: 'string', description: 'Project-relative HTML template path' } },
@@ -42,7 +43,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const result = request.params.name === 'pagestudio_validate_template'
       ? validateTemplate(args.file)
       : loadBlockContract(args.name);
-    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }], structuredContent: result };
   } catch (error) {
     return { isError: true, content: [{ type: 'text', text: error.message }] };
   }
