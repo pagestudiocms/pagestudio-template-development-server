@@ -52,3 +52,23 @@ For VS Code, configure the MCP server in the template project's `.vscode/mcp.jso
 ```
 
 The MCP server executable may be installed elsewhere; the project root selects the files to validate. The fixture directory independently selects the CMS contract bundle.
+
+## Project-local contract synchronization
+
+From the template project root, with the development server installed or linked:
+
+```sh
+npx pagestudio contracts sync --from /absolute/path/to/exported-block-contracts
+```
+
+This copies a validated CMS export into `.pagestudio/contracts/` in the template project. Existing contracts are retained if source validation fails. The command currently accepts a **local CMS export directory**; downloading versioned bundles from a remote registry is not implemented.
+
+The MCP loader resolves contracts in this order:
+
+1. Explicit directory passed programmatically
+2. `PAGESTUDIO_BLOCK_CONTRACTS_DIR`
+3. `PAGESTUDIO_PROJECT_ROOT/.pagestudio/contracts` (or `process.cwd()/.pagestudio/contracts` when the project root is unset)
+
+Once synced, you may omit `PAGESTUDIO_BLOCK_CONTRACTS_DIR` from `.vscode/mcp.json` if `PAGESTUDIO_PROJECT_ROOT` is set correctly.
+
+Add `.pagestudio/contracts/` to the template project's `.gitignore` if generated fixtures should not be committed.
