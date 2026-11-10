@@ -27,11 +27,65 @@ Configure your MCP client to execute `node /absolute/path/to/pagestudio-template
 
 The manifest must use `schemaVersion: "1.0"` and `renderer: "cms-built-in"`. This integration does not handle tenant overrides or automatic fixture synchronization.
 
-## Preliminary template validation
+## Contract-aware template validation
 
-`pagestudio_validate_template({ "file": "example/html/layouts/default.html" })` checks a project-relative HTML file against `PAGESTUDIO_PROJECT_ROOT`, falling back to the MCP process working directory. The tool returns `schemaVersion`, `valid`, `findings` (with rule IDs, severity, file and message), and explicit `limitations`.
+`pagestudio_validate_template({ "file": "example/html/layouts/default.html" })`
+checks a project-relative HTML source against `PAGESTUDIO_PROJECT_ROOT`, falling
+back to the MCP process working directory. It preserves existing file-level
+checks and adds verified CMS Lex structure, CSS/SCSS discovery, fixture selector
+matching, conservative styling rules and bounded responsive risks.
 
-This first increment checks existence, regular-file status, extension, empty content, a 1 MiB size limit, and project-root containment (including symlink resolution). It does **not** parse PageStudio syntax or validate CMS DOM/CSS compatibility yet. Validation never modifies files. Set `PAGESTUDIO_PROJECT_ROOT` to the absolute path of the template project. If unset, the MCP process working directory is used.
+Validation never modifies files, compiles SCSS, invokes plugins, contacts tenants
+or launches a browser. Missing/incomplete contracts reduce coverage and produce
+limitations. Unmatched selectors are observations. Fixture compatibility and
+responsive checks use emitted CSS discovered from the existing build configuration,
+or authored CSS in plain-CSS projects. CSS/SCSS source remains available for
+authoring diagnostics; which assets the selected page loads is not established.
+The validator never executes build scripts or JavaScript configuration. Gourmet's
+`dev` starts an asset watcher without an initial asset build; `compile` processes
+HTML only. Missing/stale CSS requires a manual run of the existing asset build.
+
+Responses retain `schemaVersion: "1.0"`, `file`, `valid`, `findings`, `limitations`
+and JSON text for existing clients. Additive `analysis` contains `stylesheets`,
+`sourceStylesheets` (authoring-only records), `assets` (expected outputs, source maps,
+freshness), loaded `contracts`, selector records and parsed `mediaQueries`. The same object
+is returned in MCP `structuredContent`. Only errors make `valid` false; warnings
+and `info` do not prove incompatibility.
+
+Every finding has these fields (locations/context may be `null`):
+
+```json
+{
+  "ruleId": "PS-CSS-101",
+  "severity": "warning",
+  "file": "assets/site.css",
+  "line": 12,
+  "column": 3,
+  "selector": ".btn",
+  "construct": null,
+  "block": "button",
+  "message": "Declaration may hide sampled CMS content.",
+  "evidence": {
+    "fixture": "block-button.html",
+    "declaration": { "property": "display", "value": "none", "important": false, "line": 12, "column": 3 }
+  },
+  "explanation": "The selector matches fixture elements; the final cascade may compensate.",
+  "recommendation": "Confirm the block should be hidden in this state."
+}
+```
+
+Selector statuses are `matched`, `unmatched`, `unsupported`. Matching evidence
+contains the CMS block, fixture file, count and up to three element samples.
+No match means only no loaded fixture matched. Fragment boundaries, dynamic
+state, unavailable/stale compiled CSS and unsupported media features limit coverage.
+Mapped findings identify SCSS locations when available and keep generated positions
+in evidence. Invalid maps fall back to CSS locations. Plain CSS needs no Webpack;
+other/dynamic builds can declare local css.outputs in `.pagestudio/validation.json`.
+
+See the [rule catalog](validation-rules.md), [verified syntax](template-syntax.md)
+and [implementation phases and limitations](contract-aware-validation.md).
+See [existing build discovery, timing, source maps and freshness](css-build-validation.md)
+for the Gourmet configuration review and non-Webpack configuration examples.
 
 For VS Code, configure the MCP server in the template project's `.vscode/mcp.json`:
 

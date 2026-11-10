@@ -1,0 +1,262 @@
+{
+    "fixture-pricing-table-0": {
+        "portlet_id": "fixture-pricing-table-0",
+        "sortable_id": "bootstrap-builder-container",
+        "content": {
+            "title": "Starter",
+            "type": "default",
+            "price": "19",
+            "sub_price": "00",
+            "currency_symbol": "$",
+            "price_title": "/mo",
+            "sortable_id": "fixture-pricing-table-children-1"
+        },
+        "portlet_type": "pricing-table",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Pricing_Table",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        }
+    },
+    "fixture-pricing-table-1": {
+        "portlet_id": "fixture-pricing-table-1",
+        "sortable_id": "fixture-pricing-table-children-1",
+        "content": "<p style=\"text-align: center;\"><strong>1</strong> Website</p>",
+        "portlet_type": "text-block",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Text_Block",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        }
+    },
+    "fixture-pricing-table-2": {
+        "portlet_id": "fixture-pricing-table-2",
+        "sortable_id": "fixture-pricing-table-children-1",
+        "content": "<p style=\"text-align: center;\"><strong>10</strong> GB Storage</p>",
+        "portlet_type": "text-block",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Text_Block",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        }
+    },
+    "fixture-pricing-table-3": {
+        "portlet_id": "fixture-pricing-table-3",
+        "sortable_id": "fixture-pricing-table-children-1",
+        "content": "<p style=\"text-align: center;\"><strong>10 GB</strong> Bandwidth</p>",
+        "portlet_type": "text-block",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Text_Block",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        }
+    },
+    "fixture-pricing-table-4": {
+        "portlet_id": "fixture-pricing-table-4",
+        "sortable_id": "fixture-pricing-table-children-1",
+        "content": "<p style=\"text-align: center;\"><strong>10</strong> Email Addresses</p>",
+        "portlet_type": "text-block",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Text_Block",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        }
+    },
+    "fixture-pricing-table-5": {
+        "portlet_id": "fixture-pricing-table-5",
+        "sortable_id": "fixture-pricing-table-children-1",
+        "content": "<p style=\"text-align: center;\">Free Backup</p>",
+        "portlet_type": "text-block",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Text_Block",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        }
+    },
+    "fixture-pricing-table-6": {
+        "portlet_id": "fixture-pricing-table-6",
+        "sortable_id": "fixture-pricing-table-children-1",
+        "content": "<p style=\"text-align: center;\">Full Time Support</p>",
+        "portlet_type": "text-block",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Text_Block",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        }
+    },
+    "fixture-pricing-table-7": {
+        "portlet_id": "fixture-pricing-table-7",
+        "sortable_id": "fixture-pricing-table-children-1",
+        "content": "<hr>",
+        "portlet_type": "html-code",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Html_Code"
+    },
+    "fixture-pricing-table-8": {
+        "portlet_id": "fixture-pricing-table-8",
+        "sortable_id": "fixture-pricing-table-children-1",
+        "content": "<a class=\"btn btn-default btn-lg\"><i class=\"fa fa-shopping-cart\" style=\"top: 2px;\"></i> Buy it now</a>",
+        "portlet_type": "button",
+        "portlet_method": "portlet_modal",
+        "portlet_url": "themes/default/undefined",
+        "portlet_object": "Button",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        },
+        "button_text": "Buy it now",
+        "button_type": "default",
+        "button_link_flag": "no",
+        "button_link_page": "",
+        "button_link_text": "",
+        "button_size": "lg",
+        "button_alignment": "center",
+        "button_icon_flag": "yes",
+        "button_icon": "fa fa-shopping-cart",
+        "button_icon_alignment": "left",
+        "button_full_width_flag": "no"
+    }
+}

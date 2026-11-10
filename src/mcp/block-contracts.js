@@ -9,10 +9,13 @@ function resolveContractsDirectory(directory) {
   return path.resolve(process.env.PAGESTUDIO_PROJECT_ROOT || process.cwd(), '.pagestudio', 'contracts');
 }
 
-function loadBlockContract(name, directory) {
+function validateBlockName(name) {
   if (typeof name !== 'string' || !/^[a-z0-9-]+$/.test(name)) {
     throw new Error('block name must contain only lowercase letters, digits and hyphens');
   }
+}
+
+function createBlockContractLoader(directory) {
   const root = resolveContractsDirectory(directory);
   const readFile = (filename) => {
     try {
@@ -28,6 +31,11 @@ function loadBlockContract(name, directory) {
   if (manifest.schemaVersion !== '1.0' || manifest.renderer !== 'cms-built-in') {
     throw new Error('Unsupported block contract manifest version or renderer');
   }
+  return { manifest, load: name => readBlockContract(name, manifest, readFile) };
+}
+
+function readBlockContract(name, manifest, readFile) {
+  validateBlockName(name);
   const block = manifest.blocks && Object.prototype.hasOwnProperty.call(manifest.blocks, name) ? manifest.blocks[name] : null;
   if (!block) throw new Error('Unknown or disabled PageStudio block: ' + name);
   const fixture = (manifest.fixtures || []).find(item => item.name === name);
@@ -55,4 +63,9 @@ function loadBlockContract(name, directory) {
   };
 }
 
-module.exports = { loadBlockContract, resolveContractsDirectory };
+function loadBlockContract(name, directory) {
+  validateBlockName(name);
+  return createBlockContractLoader(directory).load(name);
+}
+
+module.exports = { loadBlockContract, resolveContractsDirectory, createBlockContractLoader };

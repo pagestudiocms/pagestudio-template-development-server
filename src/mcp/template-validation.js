@@ -2,6 +2,11 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { analyzeStylesheets } = require('./stylesheet-analysis');
+const { analyzeCompatibility } = require('./css-compatibility');
+const { analyzeTemplateSyntax } = require('./template-syntax');
+const { analyzeResponsive } = require('./responsive-analysis');
+const { normalizeFinding } = require('./diagnostics');
 
 const RULES = Object.freeze({
   MISSING_FILE: 'PS-TPL-001',
@@ -24,17 +29,20 @@ function validateTemplate(file, root = process.env.PAGESTUDIO_PROJECT_ROOT || pr
     throw new Error('file must be within the project root');
   }
   const findings = [];
+  const limitations = [
+    'Passing validation does not guarantee CMS compatibility.',
+    'Browser rendering, visual correctness and the complete CSS cascade are not validated.',
+    'The requested HTML source and discovered project stylesheets are checked; stylesheet loading, inline style blocks, linked external assets and HTML includes are not resolved.'
+  ];
+  let analysis = { stylesheets: [], sourceStylesheets: [], assets: { mode: 'unavailable', expected: [], artifacts: [] }, contracts: [], selectors: [], mediaQueries: [] };
   const add = (ruleId, severity, message) => findings.push({ ruleId, severity, file, message });
   const result = () => ({
     schemaVersion: '1.0',
     file,
     valid: !findings.some(item => item.severity === 'error'),
-    findings,
-    limitations: [
-      'Checks are limited to file accessibility, extension and non-empty content.',
-      'CMS template syntax, CSS selectors, rendering and responsive behavior are not validated.',
-      'Passing validation does not guarantee CMS compatibility.'
-    ]
+    findings: findings.map(normalizeFinding),
+    analysis,
+    limitations: [...new Set(limitations)]
   });
   if (path.extname(file).toLowerCase() !== '.html') {
     add(RULES.INVALID_EXTENSION, 'error', 'Expected an HTML template file (.html)');
@@ -58,8 +66,18 @@ function validateTemplate(file, root = process.env.PAGESTUDIO_PROJECT_ROOT || pr
     add(RULES.INVALID_ROOT, 'error', 'Template path must refer to a regular file');
   } else if (stat.size > MAX_BYTES) {
     add(RULES.FILE_TOO_LARGE, 'error', 'Template exceeds the 1 MiB validation limit');
-  } else if (!fs.readFileSync(target, 'utf8').trim()) {
-    add(RULES.EMPTY_FILE, 'warning', 'Template file is empty or whitespace only');
+  } else {
+    const source = fs.readFileSync(target, 'utf8');
+    if (!source.trim()) add(RULES.EMPTY_FILE, 'warning', 'Template file is empty or whitespace only');
+    if (path.extname(file).toLowerCase() === '.html') {
+      const syntax = analyzeTemplateSyntax(source, file);
+      const styles = analyzeStylesheets(base);
+      const responsive = analyzeResponsive(styles);
+      findings.push(...syntax.findings, ...styles.findings, ...analyzeCompatibility(styles), ...responsive.findings);
+      limitations.push(...syntax.limitations, ...styles.limitations, ...responsive.limitations);
+      analysis = { stylesheets: styles.stylesheets, sourceStylesheets: styles.sourceStylesheets, assets: styles.assets,
+        contracts: styles.contracts, selectors: styles.selectors, mediaQueries: responsive.mediaQueries };
+    }
   }
   return result();
 }
