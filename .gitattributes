@@ -1,0 +1,2 @@
+# Preserve whitespace emitted by the authoritative CMS renderer in raw snapshots.
+tests/fixtures/cms-contracts/*.html -whitespace
