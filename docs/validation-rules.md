@@ -16,6 +16,8 @@ implies invalid markup, and no rule mandates undocumented CMS styling.
 | PS-CSS-101 | warning | Matched sample declares `display:none`, `visibility:hidden/collapse`, or literal zero opacity | Verify intentional hiding and visible alternatives |
 | PS-CSS-102 | info | Important author declaration differs from a normal inline value in sampled matching elements | Confirm intended override |
 | PS-CSS-103 | warning | Matched sample receives `all:unset/initial/revert/revert-layer` | Review reset scope and component styling |
+| PS-SYN-001 | error | Known CMS Lex delimiter/comment/noparse boundary is incomplete or unmatched | Complete the documented delimiter or pair |
+| PS-SYN-002 | error | Known CMS Lex conditional is empty, unmatched, unclosed or has invalid branch order | Correct the conditional structure |
 
 CSS rules describe declarations that could apply; they do not resolve loading,
 specificity, conditional feature support, animation, inheritance or the final
@@ -27,3 +29,5 @@ syntax without assuming invalid inline CSS proves a conflict.
 PS-CSS-001 positive/negative coverage is in `mcp-stylesheet-analysis.spec.js`;
 PS-CSS-101–103 each have positive and negative cases in
 `mcp-css-compatibility.spec.js`, including ordinary intentional overrides.
+PS-SYN-001–002 have positive/negative cases in `mcp-template-syntax.spec.js`.
+See [verified syntax sources and limitations](template-syntax.md).

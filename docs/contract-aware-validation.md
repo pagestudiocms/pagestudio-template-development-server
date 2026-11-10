@@ -49,3 +49,16 @@ errors are CSS errors. Each compatibility rule has positive and negative tests.
 Phase 2 review: six compatibility-rule tests and all 36 regression tests pass;
 one optional external-bundle test is pending. All three compatibility rules have
 positive and negative cases. No contract-dependent error rule was invented.
+
+## Phase 3: verified template syntax
+
+The PHP CMS implementation and development parser were inspected before adding
+syntax rules. [Source inventory and dialect differences](template-syntax.md)
+ground checks for Lex comments, noparse and conditional structure. Unknown or
+data-dependent constructs stay unchecked with explicit limitations. No compiler
+code is changed and validation never evaluates expressions or invokes plugins.
+
+Phase 3 review: six syntax tests pass, including opaque noparse content, exact
+locations and unchanged compilation. Full regression suite passes (42 tests;
+one optional external-bundle test pending). No authoritative grammar was found
+for full plugin parameters or PHP expressions; these remain explicit limitations.
