@@ -35,8 +35,8 @@ generated locations. Missing or possibly stale assets are explicit warnings and
 limitations; timestamps alone cannot prove staleness or freshness.
 
 The [Gourmet configuration review](../css-build-validation.md) establishes that
-dev starts a Grunt watcher without an initial asset build and compile processes
-HTML only. Validation never runs a build to compensate. No redundant Sass pipeline
+the former dev command started only a Grunt watcher; standalone compile handles
+HTML only. [ADR 0004](0004-dev-build-readiness.md) adds initial dev builds and readiness. Validation never runs a build to compensate. No redundant Sass pipeline
 is added; tests use the existing Webpack loader toolchain in temporary fixtures.
 
 Apply the [tested rule catalog](../validation-rules.md). Unmatched selectors are

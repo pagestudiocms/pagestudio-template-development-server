@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+'use strict';
+// Compatibility for existing templates that invoke node .../bin/pagestudio.
+require('./pagestudio.js');

@@ -41,6 +41,16 @@ describe('MCP stdio protocol', function () {
     const result = await client.listTools();
     assert.ok(result.tools.some(tool => tool.name === 'pagestudio_get_block_contract'));
   });
+  it('advertises read-only build status and returns unavailable without running scripts or creating status', async function () {
+    const listed = await client.listTools();
+    const tool = listed.tools.find(item => item.name === 'pagestudio_get_build_status');
+    assert.equal(tool.annotations.readOnlyHint, true);
+    fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({scripts:{'build-assets':'touch NEVER_RUN'}}));
+    const response = await client.callTool({name:tool.name,arguments:{}});
+    assert.deepEqual(response.structuredContent, JSON.parse(response.content[0].text));
+    assert.equal(response.structuredContent.state, 'unavailable'); assert.equal(response.structuredContent.ready, false);
+    assert.ok(!fs.existsSync(path.join(root, '.pagestudio'))); assert.ok(!fs.existsSync(path.join(root, 'NEVER_RUN')));
+  });
   it('returns CMS HTML over MCP', async function () {
     const result = await client.callTool({ name: 'pagestudio_get_block_contract', arguments: { name: 'button' } });
     assert.equal(result.isError, undefined);

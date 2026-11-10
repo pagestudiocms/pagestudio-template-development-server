@@ -55,7 +55,7 @@ exports.run = (options) => {
     ignore: ignore,
     wait: 2000,
     mount: [
-      ['/assets', './compiled/assets'],
+      ['/assets', path.join(webroot, 'assets')],
       ['/images', './demo/images'],
     ],
     logLevel: 2,
@@ -69,7 +69,14 @@ exports.run = (options) => {
   };
 
   try {
-    liveServer.start(liveServerParams);
+    const server = liveServer.start(liveServerParams);
+    if (process.env.PAGESTUDIO_DEV_CHILD === '1' && process.send) {
+      server.once('listening', () => process.send({ type: 'pagestudio:preview-ready', port: server.address().port }));
+      server.on('error', () => process.send({ type: 'pagestudio:preview-error' }));
+      liveServer.watcher.on('error', () => process.send({ type: 'pagestudio:preview-error' }));
+      process.once('disconnect', () => { liveServer.shutdown(); process.exit(0); });
+      process.once('SIGTERM', () => { liveServer.shutdown(); process.exit(0); });
+    }
   } catch (error) {
     console.error(chalk.red("Error starting server:"), error);
     process.exit(1);

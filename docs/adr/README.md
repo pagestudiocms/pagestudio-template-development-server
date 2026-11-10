@@ -7,3 +7,5 @@
 - [0003 — Local development, proxy preview and packaging boundaries](0003-development-preview-packaging.md) — Proposed (documents current behavior and proposed boundaries)
 
 Related CMS decisions live in `pagestudiocms/pagestudiocms/docs/adr/`.
+
+- [0004 — Dev lifecycle and cross-process readiness](0004-dev-build-readiness.md) — Accepted
