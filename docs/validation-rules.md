@@ -18,6 +18,8 @@ implies invalid markup, and no rule mandates undocumented CMS styling.
 | PS-CSS-103 | warning | Matched sample receives `all:unset/initial/revert/revert-layer` | Review reset scope and component styling |
 | PS-SYN-001 | error | Known CMS Lex delimiter/comment/noparse boundary is incomplete or unmatched | Complete the documented delimiter or pair |
 | PS-SYN-002 | error | Known CMS Lex conditional is empty, unmatched, unclosed or has invalid branch order | Correct the conditional structure |
+| PS-RESP-001 | warning | Matched element's literal width/min-width exceeds a supported media range upper bound | Preview the range; consider fluid sizing or intentional scrolling |
+| PS-RESP-002 | warning | Same selector/property in distinct, overlapping media contexts within one file has different values | Review breakpoint overlap and keep intentional overrides |
 
 CSS rules describe declarations that could apply; they do not resolve loading,
 specificity, conditional feature support, animation, inheritance or the final
@@ -31,3 +33,6 @@ PS-CSS-101–103 each have positive and negative cases in
 `mcp-css-compatibility.spec.js`, including ordinary intentional overrides.
 PS-SYN-001–002 have positive/negative cases in `mcp-template-syntax.spec.js`.
 See [verified syntax sources and limitations](template-syntax.md).
+PS-RESP-001–002 have positive/negative cases in `mcp-responsive-analysis.spec.js`.
+Neither rule asserts that layout is broken; compensating constraints and
+intentional cascade overrides are possible.

@@ -132,6 +132,7 @@ function analyzeStylesheets(root) {
       for (const selector of parsed.nodes) {
         const record = { file, ...location(rule), selector: selector.toString().trim(), status: 'unmatched', matches: [],
           media: ancestors.filter(node => node.type === 'atrule' && node.name.toLowerCase() === 'media').reverse().map(node => node.params),
+          contexts: ancestors.filter(node => node.type === 'atrule' && node.name.toLowerCase() !== 'media').map(node => ({ name: node.name.toLowerCase(), params: node.params })),
           declarations: (rule.nodes || []).filter(node => node.type === 'decl').map(node => ({ property: node.prop.toLowerCase(), value: node.value,
             important: Boolean(node.important), ...location(node) })) };
         const context = ancestors.some(node => node.type === 'rule' ||

@@ -62,3 +62,25 @@ Phase 3 review: six syntax tests pass, including opaque noparse content, exact
 locations and unchanged compilation. Full regression suite passes (42 tests;
 one optional external-bundle test pending). No authoritative grammar was found
 for full plugin parameters or PHP expressions; these remain explicit limitations.
+
+## Phase 4: responsive compatibility
+
+`responsive-analysis.js` uses postcss-media-query-parser and
+postcss-value-parser to interpret inclusive pixel width ranges. It supports
+`screen`/`all`, optional `only`, conjunctions, comma lists and nested media
+intersection. Parsed queries are cached per call. Other units, negation, range
+syntax, non-width features and container/feature conditions are limitations.
+No browser dependency is needed for these bounded static checks.
+
+PS-RESP-001 warns about fixture width/min-width declarations exceeding a media
+range upper bound. PS-RESP-002 warns about different responsive values for the
+same selector and property in overlapping media contexts in the same file.
+Ordinary base-to-responsive overrides, disjoint ranges and equal values do not
+trigger overlap findings. Overlap analysis stops at 2,000 matched records or
+10,000 comparisons; lists/nested intersections are bounded to 32/64 intervals.
+Warnings report possible interactions and never claim visual correctness.
+
+Phase 4 review: seven responsive tests and all 49 regression tests pass; one
+optional external-bundle test remains pending. Coverage includes exact inclusive
+breakpoints, media lists, nested/disjoint ranges, intentional overrides and
+unsupported media features. All responsive findings are warnings.
