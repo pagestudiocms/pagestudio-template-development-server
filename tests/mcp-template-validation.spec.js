@@ -17,6 +17,30 @@ describe('MCP template validation', function () {
     assert.deepEqual(result.findings, []);
     assert.match(result.limitations.join(' '), /not validated/);
   });
+  it('uses PAGESTUDIO_PROJECT_ROOT when an explicit root is not provided', function () {
+    fs.writeFileSync(path.join(root, 'index.html'), '<main>Project</main>');
+    const previous = process.env.PAGESTUDIO_PROJECT_ROOT;
+    try {
+      process.env.PAGESTUDIO_PROJECT_ROOT = root;
+      const result = validateTemplate('index.html');
+      assert.equal(result.valid, true);
+      assert.deepEqual(result.findings, []);
+    } finally {
+      if (previous === undefined) delete process.env.PAGESTUDIO_PROJECT_ROOT;
+      else process.env.PAGESTUDIO_PROJECT_ROOT = previous;
+    }
+  });
+  it('lets an explicit root override PAGESTUDIO_PROJECT_ROOT', function () {
+    fs.writeFileSync(path.join(root, 'index.html'), '<main>Project</main>');
+    const previous = process.env.PAGESTUDIO_PROJECT_ROOT;
+    try {
+      process.env.PAGESTUDIO_PROJECT_ROOT = path.join(root, 'not-a-project');
+      assert.equal(validateTemplate('index.html', root).valid, true);
+    } finally {
+      if (previous === undefined) delete process.env.PAGESTUDIO_PROJECT_ROOT;
+      else process.env.PAGESTUDIO_PROJECT_ROOT = previous;
+    }
+  });
   it('reports a missing file', function () {
     const result = validateTemplate('missing.html', root);
     assert.equal(result.valid, false);
