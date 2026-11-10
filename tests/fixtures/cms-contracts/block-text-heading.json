@@ -1,0 +1,39 @@
+{
+    "fixture-text-heading-0": {
+        "portlet_id": "fixture-text-heading-0",
+        "sortable_id": "bootstrap-builder-container",
+        "content": "Text heading",
+        "portlet_type": "text-heading",
+        "portlet_method": "portlet_modal",
+        "portlet_object": "Text_Heading",
+        "style": {
+            "text-align": "left",
+            "color": "",
+            "font-size": "",
+            "line-height": "",
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        },
+        "heading_text": "Text heading",
+        "heading_tag": "h1",
+        "heading_link_flag": "no",
+        "heading_link_page": "",
+        "heading_link_text": ""
+    }
+}

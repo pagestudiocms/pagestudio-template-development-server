@@ -1,0 +1,41 @@
+{
+    "fixture-button-0": {
+        "portlet_id": "fixture-button-0",
+        "sortable_id": "bootstrap-builder-container",
+        "content": "<a class=\"btn btn-default btn-md\">Button text</a>",
+        "portlet_type": "button",
+        "portlet_method": "portlet_modal",
+        "portlet_object": "Button",
+        "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+        },
+        "attr": {
+            "class": ""
+        },
+        "button_text": "Button text",
+        "button_type": "default",
+        "button_link_flag": "no",
+        "button_link_page": "",
+        "button_link_text": "",
+        "button_size": "md",
+        "button_alignment": "left",
+        "button_icon_flag": "no",
+        "button_icon": "",
+        "button_icon_alignment": "left",
+        "button_full_width_flag": "no"
+    }
+}
