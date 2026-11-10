@@ -12,7 +12,7 @@ const RULES = Object.freeze({
 });
 const MAX_BYTES = 1024 * 1024;
 
-function validateTemplate(file, root = process.cwd()) {
+function validateTemplate(file, root = process.env.PAGESTUDIO_PROJECT_ROOT || process.cwd()) {
   if (typeof file !== 'string' || !file.trim()) throw new Error('file must be a non-empty relative path');
   if (typeof root !== 'string' || !root.trim()) throw new Error('root must be a non-empty directory');
   const base = fs.realpathSync(root);
