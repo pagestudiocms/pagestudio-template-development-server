@@ -3,11 +3,17 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+function resolveContractsDirectory(directory) {
+  if (directory) return path.resolve(directory);
+  if (process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR) return path.resolve(process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR);
+  return path.resolve(process.env.PAGESTUDIO_PROJECT_ROOT || process.cwd(), '.pagestudio', 'contracts');
+}
+
 function loadBlockContract(name, directory) {
   if (typeof name !== 'string' || !/^[a-z0-9-]+$/.test(name)) {
     throw new Error('block name must contain only lowercase letters, digits and hyphens');
   }
-  const root = path.resolve(directory || process.env.PAGESTUDIO_BLOCK_CONTRACTS_DIR || path.join(process.cwd(), 'block-contracts'));
+  const root = resolveContractsDirectory(directory);
   const readFile = (filename) => {
     try {
       return fs.readFileSync(path.join(root, filename), 'utf8');
@@ -49,4 +55,4 @@ function loadBlockContract(name, directory) {
   };
 }
 
-module.exports = { loadBlockContract };
+module.exports = { loadBlockContract, resolveContractsDirectory };
