@@ -25,4 +25,10 @@ Configure your MCP client to execute `node /absolute/path/to/pagestudio-template
 
 `pagestudio_get_block_contract({ "name": "pricing-table" })` returns the enabled block's configuration, renderer classification, complete sample portlets, and actual PHP-rendered HTML. Disabled or unknown blocks return a tool error.
 
-The manifest must use `schemaVersion: "1.0"` and `renderer: "cms-built-in"`. This initial integration does not handle tenant overrides, automatic fixture synchronization, or template validation.
+The manifest must use `schemaVersion: "1.0"` and `renderer: "cms-built-in"`. This integration does not handle tenant overrides or automatic fixture synchronization.
+
+## Preliminary template validation
+
+`pagestudio_validate_template({ "file": "example/html/layouts/default.html" })` checks a project-relative HTML file against the MCP process working directory. The tool returns `schemaVersion`, `valid`, `findings` (with rule IDs, severity, file and message), and explicit `limitations`.
+
+This first increment checks existence, regular-file status, extension, empty content, a 1 MiB size limit, and project-root containment (including symlink resolution). It does **not** parse PageStudio syntax or validate CMS DOM/CSS compatibility yet. Validation never modifies files. Start the MCP process with the template project as its working directory.
