@@ -10,7 +10,8 @@
   },
   "main": "src/compiler/index.js",
   "bin": {
-    "pagestudio": "./bin/pagestudio.js"
+    "pagestudio": "./bin/pagestudio.js",
+    "pagestudio-mcp": "./bin/pagestudio-mcp.js"
   },
   "dependencies": {
     "chai": "^4.3.8",
@@ -37,7 +38,8 @@
     "sass-loader": "^16.0.4",
     "watch": "^1.0.2",
     "webpack": "^5.97.1",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "scripts": {
     "test": "mocha --recursive tests/**/*.spec.js",
@@ -48,6 +50,7 @@
     "dev": "node bin/pagestudio.js dev --src example/html --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
     "start": "node bin/pagestudio.js dev --src example/html --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
     "server": "node bin/pagestudio.js server",
-    "compile": "node bin/pagestudio.js compile --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts"
+    "compile": "node bin/pagestudio.js compile --src example/html --out compiled --data-src example/html/data --partials example/html/partials --layouts example/html/layouts",
+    "mcp": "node bin/pagestudio-mcp.js"
   }
 }
