@@ -151,3 +151,34 @@ inclusion, client configuration/guidance consistency and real stdio MCP protocol
 behavior in a non-Gourmet project. These tests do not claim native-agent obedience
 or browser correctness. The accepted Gourmet generation remains historical evidence
 after its isolated setup owner is stopped.
+
+## Native Codex VS Code follow-up (November 11, 2026)
+
+The earlier isolated Gourmet demonstration did **not** verify native Codex
+tool-picker discovery. A subsequent, separate user-observed Codex VS Code
+session reported direct calls to all three connected PageStudio MCP tools,
+without shell/Node.js substitution. The `button` contract returned
+`Button_Portlet` and its rendered fixture; build status was ready at
+session `6dbe483b-2261-4243-82a3-133092b1a426`, generation 1.
+`src/html/layouts/components.html` validated `valid=true`, and the
+ready session/generation were unchanged afterward.
+
+Codex then reported adding `border-radius: 4px` to
+`.aas-theme-showcase__swatch` in Gourmet's
+`src/scss/components/_aas-theme-showcase.scss`. The existing owner
+reported ready generation 2 in the same session; the validator attributed
+the compiled declaration to that SCSS rule and returned `valid=true`
+for `components.html`. A final status check remained ready at generation
+2 with no pending changes.
+
+This is **reported native-client integration evidence**, not an automated
+package test or independently captured raw tool trace. It resolves the
+native invocation gap for that local Codex VS Code configuration, while
+preserving the historical failed project-file lookup in the earlier run.
+The follow-up retained 21 findings (1 `PS-ASSET-002`, 5 `PS-CSS-101`,
+13 `PS-RESP-002`, 2 informational `PS-CSS-102`). The asset-freshness
+warning and browser/visual checks remain open. Only `components.html` was
+reported validated after the SCSS edit; this follow-up alone does not
+demonstrate a whole-affected-layout validation batch.
+
+See the separate [Gourmet follow-up report](https://github.com/pagestudiocms/gourmet-template/blob/feat/agent-hero-verification/docs/agent-hero-evidence/README.md).
