@@ -1,0 +1,14 @@
+# Merge into the template project's .codex/config.toml; replace all absolute paths.
+# Project configuration is loaded only for trusted projects. Do not change trust
+# settings or overwrite an existing client configuration automatically.
+[mcp_servers.pagestudio]
+command = "node"
+args = ["/absolute/path/to/development-server/bin/pagestudio-mcp.js"]
+cwd = "/absolute/path/to/template-project"
+startup_timeout_sec = 20
+tool_timeout_sec = 120
+
+[mcp_servers.pagestudio.env]
+PAGESTUDIO_PROJECT_ROOT = "/absolute/path/to/template-project"
+# Uses the project's .pagestudio/contracts by default. Set an export override only
+# when intentionally selecting a different verified fixture bundle.

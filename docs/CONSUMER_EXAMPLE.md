@@ -2,6 +2,10 @@
 
 This is an example of how to use `@pagestudiocms/pagestudio-template-development-server` in your own PageStudio template project.
 
+For MCP-guided editing and verifiable agent reports, use the
+[agent workflow adoption guide](agent-workflow/README.md). Inspect existing scripts
+before adapting the starter example; do not replace a template's packaging build.
+
 ## Setup
 
 1. Install the development server:
@@ -14,12 +18,13 @@ npm install @pagestudiocms/pagestudio-template-development-server
 {
   "name": "my-pagestudio-theme",
   "scripts": {
-    "dev": "pagestudio-dev",
-    "build": "pagestudio-compile",
-    "serve": "pagestudio-server --port 8080"
+    "start": "pagestudio dev",
+    "dev": "pagestudio dev",
+    "build": "pagestudio compile",
+    "serve": "pagestudio server --port 8080"
   },
   "dependencies": {
-    "@pagestudiocms/pagestudio-template-development-server": "^2.1.0-beta1"
+    "@pagestudiocms/pagestudio-template-development-server": "^3.0.0-beta1"
   }
 }
 ```
@@ -30,7 +35,7 @@ npm install @pagestudiocms/pagestudio-template-development-server
   "src": "templates",
   "out": "dist",
   "layouts": "templates/layouts",
-  "partials": "templates/partials", 
+  "partials": "templates/partials",
   "data-src": "templates/data",
   "port": 8080,
   "open": true
@@ -60,7 +65,7 @@ npm run serve
 ### Custom Configuration
 Use command line options:
 ```bash
-npx pagestudio-dev --src my-templates --port 9000 --config my-config.json
+npx pagestudio dev --src my-templates --port 9000 --config my-config.json
 ```
 
 ## Project Structure

@@ -10,3 +10,5 @@ Code to run php server directly for troubleshooting!
 npm unlink -g && npm link  # Re-link globally
 npm link @pagestudiocms/pagestudio-template-development-server  # Link in consumer
 ```
+For portable template AGENTS.md instructions, client configuration examples and
+the live verification checklist, see [agent workflow](agent-workflow/README.md).
