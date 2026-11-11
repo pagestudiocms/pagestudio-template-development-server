@@ -2,6 +2,10 @@
 
 ## Reviewed Gourmet configuration and build timing
 
+These observations describe the pre-issue-11 lifecycle. Current dev owns initial
+asset/HTML builds and source watching; see [current lifecycle](dev-build-readiness.md).
+Standalone compile still handles HTML only and MCP never executes builds.
+
 The design was checked against the Gourmet template's `package.json`,
 `Gruntfile.js` and `webpack.config.js`, and the development server's
 `src/commands/dev.js`, `src/commands/compile.js`, `src/compiler/index.js` and

@@ -172,7 +172,8 @@ read-only file snapshots. `git diff --check` passes.
 
 Reviewed Gourmet's package scripts, Gruntfile and Webpack configuration, plus the
 development server's dev/compile implementation, before changing validation.
-Dev starts `grunt watch` without an initial asset build; compile handles HTML.
+That review predates issue #11: current dev owns initial builds/watchers and
+[readiness](dev-build-readiness.md); standalone compile still handles HTML.
 Gourmet's existing Webpack pipeline emits `compiled/assets/css/style.css` and
 copies `src/css` assets. The validator reads those outputs and never runs builds.
 

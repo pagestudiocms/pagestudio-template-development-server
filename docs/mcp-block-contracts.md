@@ -41,9 +41,10 @@ limitations. Unmatched selectors are observations. Fixture compatibility and
 responsive checks use emitted CSS discovered from the existing build configuration,
 or authored CSS in plain-CSS projects. CSS/SCSS source remains available for
 authoring diagnostics; which assets the selected page loads is not established.
-The validator never executes build scripts or JavaScript configuration. Gourmet's
-`dev` starts an asset watcher without an initial asset build; `compile` processes
-HTML only. Missing/stale CSS requires a manual run of the existing asset build.
+The validator never executes build scripts or JavaScript configuration. Current
+`dev` owns initial asset/HTML builds and watchers; standalone `compile` handles
+HTML only. Use pagestudio_get_build_status before validation, then confirm the
+same session/generation remains ready afterwards. Outside dev, build manually.
 
 Responses retain `schemaVersion: "1.0"`, `file`, `valid`, `findings`, `limitations`
 and JSON text for existing clients. Additive `analysis` contains `stylesheets`,
@@ -126,3 +127,10 @@ The MCP loader resolves contracts in this order:
 Once synced, you may omit `PAGESTUDIO_BLOCK_CONTRACTS_DIR` from `.vscode/mcp.json` if `PAGESTUDIO_PROJECT_ROOT` is set correctly.
 
 Add `.pagestudio/contracts/` to the template project's `.gitignore` if generated fixtures should not be committed.
+
+## Read-only build status
+
+pagestudio_get_build_status({}) reads current project dev status without starting
+processes or writing files. Idle/building/ready/failed describe a live owner;
+missing, stale, stopped or inconsistent ownership is unavailable, never success.
+See [status schema and agent workflow](dev-build-readiness.md).

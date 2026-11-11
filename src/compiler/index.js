@@ -28,6 +28,7 @@ class TemplateCompiler {
     this.options = {
       src: options.src || 'src',
       out: options.out || 'compiled',
+      layouts: options.layouts || path.join(options.src || 'src', 'layouts'),
       partials: options.partials || 'src/partials',
       dataSrc: options.dataSrc || 'src/html/data'
     };
@@ -61,8 +62,8 @@ class TemplateCompiler {
    * @param {string} filePath - Path to template file
    */
   compileFile(filePath) {
-    const layoutPath = path.join(this.options.src, 'layouts');
-    const isLayoutFile = filePath.startsWith(layoutPath);
+    const layoutPath = path.resolve(this.options.layouts);
+    const isLayoutFile = path.resolve(filePath).startsWith(layoutPath + path.sep);
     if( ! isLayoutFile) return;
     
     // Read the template file
@@ -85,6 +86,7 @@ class TemplateCompiler {
     // Save the processed template
     saveProcessedTemplate(processedContent, filePath, {
       src: this.options.src,
+      layouts: this.options.layouts,
       out: this.options.out
     });
 
@@ -101,7 +103,7 @@ class TemplateCompiler {
       this.registerPlugins();
       
       // Find all template files
-      const files = await findTemplateFiles(this.options.src);
+      const files = await findTemplateFiles(this.options.layouts);
       
       // Process each template file
       for (const filePath of files) {
@@ -122,11 +124,13 @@ class TemplateCompiler {
   watch() {
     return setupWatcher({
       src: this.options.src,
+      layouts: this.options.layouts,
+      partials: this.options.partials,
       onFileChange: (filePath) => {
-        const layoutPath = path.join(this.options.src, 'layouts');
-        const partialPath = path.join(this.options.src, 'partials');
-        const isLayoutFile = filePath.startsWith(layoutPath);
-        const isPartialFile = filePath.startsWith(partialPath);
+        const layoutPath = path.resolve(this.options.layouts);
+        const partialPath = path.resolve(this.options.partials);
+        const isLayoutFile = path.resolve(filePath).startsWith(layoutPath + path.sep);
+        const isPartialFile = path.resolve(filePath).startsWith(partialPath + path.sep);
 
         if (isLayoutFile && filePath.endsWith('.html')) {
           const layoutName = path.basename(filePath, '.html');

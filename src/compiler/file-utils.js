@@ -57,11 +57,11 @@ const saveProcessedTemplate = (content, filePath, options) => {
   const { src, out } = options;
 
   // Define the output path for the compiled layout in the compiled folder
-  const relativeFilePath = path.relative(src, filePath); // Remove the "src" folder part
+  const relativeFilePath = path.relative(options.layouts || src, filePath); // Remove the "src" folder part
   const distFilePath = path.join(out, relativeFilePath);
 
   // Remove 'layouts' from the file path (we don't want the "layouts" folder in compiled)
-  const distFilePathWithoutLayouts = distFilePath.replace(/layouts\//, '');
+  const distFilePathWithoutLayouts = options.layouts ? distFilePath : distFilePath.replace(/layouts\//, '');
 
   // Create the necessary directories in the compiled folder
   fse.ensureDirSync(path.dirname(distFilePathWithoutLayouts));

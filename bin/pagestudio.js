@@ -70,24 +70,28 @@ program
   .option('-c, --config <path>', 'Config file path')
   .option('-w, --watch', 'Watch for file changes')
   .action((options) => {
-    require('../src/commands/compile').run(options);
+    return require('../src/commands/compile').run(options);
   });
 
 // Dev command - orchestrates everything
 program
   .command('dev')
   .description('Start full development environment (assets, compiler, server)')
-  .option('--src <path>', 'Source directory', 'src/html')
-  .option('--out <path>', 'Output directory', 'compiled')
-  .option('--layouts <path>', 'Layouts directory', 'src/html/layouts')
-  .option('--partials <path>', 'Partials directory', 'src/html/partials')
-  .option('--data-src <path>', 'Data directory', 'src/html/data')
+  .option('--src <path>', 'Source directory (default: src/html)')
+  .option('--out <path>', 'Output directory (default: compiled)')
+  .option('--layouts <path>', 'Layouts directory')
+  .option('--partials <path>', 'Partials directory')
+  .option('--data-src <path>', 'Data directory')
   .option('--assets <path>', 'Assets directory', 'src/assets')
-  .option('--port <number>', 'Server port', '3000')
-  .option('--open <boolean>', 'Open browser automatically', 'true')
+  .option('--port <number>', 'Server port (default: 3000)')
+  .option('--open <boolean>', 'Open browser automatically (default: true)')
+  .option('--host <host>', 'Preview host (default: 127.0.0.1)')
+  .option('--asset-script <name>', 'Existing one-shot npm asset script, or none')
+  .option('--asset-watch <paths>', 'Comma-separated literal asset input paths')
+  .option('--debounce <ms>', 'Quiet window for rebuilds (default: 100)')
   .option('--config <path>', 'Config file path')
   .action((options) => {
-    require('../src/commands/dev').run(options);
+    return require('../src/commands/dev').run(options);
   });
 
 // Clean command
@@ -119,7 +123,10 @@ contracts.command('sync')
   });
 
 // Parse command line arguments
-program.parse(process.argv);
+program.parseAsync(process.argv).catch(error => {
+  console.error(chalk.red(error.message));
+  process.exitCode = 1;
+});
 
 // Show help if no command provided
 if (!process.argv.slice(2).length) {

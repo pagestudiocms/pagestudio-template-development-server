@@ -1,3 +1,5 @@
+For the unified local lifecycle and agent verification, see [dev build readiness](dev-build-readiness.md).
+
 Code to run php server directly for troubleshooting!
 
 ```

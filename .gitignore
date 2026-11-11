@@ -4,3 +4,7 @@ dist
 demo/*
 !demo/.gitkeep
 node_modules
+.pagestudio/build-status.json
+.pagestudio/dev.lock
+.pagestudio/dev.lock.recovery
+.pagestudio/*.tmp

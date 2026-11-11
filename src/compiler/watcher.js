@@ -34,8 +34,8 @@ const setupWatcher = (options) => {
   }
   
   const filepath = [
-    path.join(src, 'layouts'),
-    path.join(src, 'partials')
+    path.resolve(options.layouts || path.join(src, 'layouts')),
+    path.resolve(options.partials || path.join(src, 'partials'))
   ];
 
   const watcher = chokidar.watch(filepath, {

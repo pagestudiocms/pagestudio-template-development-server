@@ -13,7 +13,7 @@ const { TemplateCompiler } = require('../compiler');
  * Run the template compiler
  * @param {object} options - Command options
  */
-exports.run = (options) => {
+exports.run = async (options) => {
   // Validate config file path if provided
   if (options.config && !fs.existsSync(options.config)) {
     console.error(`Warning: Config file "${options.config}" not found. Default "<project-root>/site.config.json" path will be used if exists.`);
@@ -68,10 +68,10 @@ exports.run = (options) => {
   const compiler = new TemplateCompiler(finalConfig);
 
   // Run compilation
-  compiler.compile();
+  await compiler.compile();
 
   // Watch mode
   if (finalConfig.watch) {
-    compiler.watch();
+    return compiler.watch();
   }
 };
