@@ -1,0 +1,10 @@
+{
+  "servers": {
+    "pagestudio": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/absolute/path/to/development-server/bin/pagestudio-mcp.js"],
+      "env": {"PAGESTUDIO_PROJECT_ROOT": "${workspaceFolder}"}
+    }
+  }
+}

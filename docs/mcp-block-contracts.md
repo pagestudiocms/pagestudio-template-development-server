@@ -134,3 +134,10 @@ pagestudio_get_build_status({}) reads current project dev status without startin
 processes or writing files. Idle/building/ready/failed describe a live owner;
 missing, stale, stopped or inconsistent ownership is unavailable, never success.
 See [status schema and agent workflow](dev-build-readiness.md).
+
+## Agent adoption
+
+The [template agent workflow](agent-workflow/README.md) distributes portable
+AGENTS.md and client examples, plus the full contract/readiness/validation
+protocol and a report template. Native client discovery, transport verification,
+static validation and browser appearance are recorded as separate claims.
