@@ -5,53 +5,147 @@ CMS fixture contracts, read-only validator and running dev owner's build status.
 It adds no compiler, agent control plane, browser automation or build execution
 inside MCP. Paths come from the adopting project rather than a Gourmet convention.
 
-## Adopt in another template
+## Installation and initialization (Codex VS Code)
 
-1. Install/link a development-server package exposing all three tools below. Tool
-   discovery is required: an unchanged package version string is not capability proof.
-2. Inspect package scripts, site/build configuration and source conventions. Resolve
-   the actual layouts, partials, data, CSS/SCSS/JS inputs and emitted asset paths.
-3. Copy `resources/agent-workflow/AGENTS.md` from this package to the template root.
-   If guidance already exists, merge the workflow without overwriting local rules.
-   Commit the adapted instructions in the template repository. The package resource
-   remains the reusable distribution source; it does not prescribe template paths.
-4. Obtain a verified CMS export and run the existing `pagestudio contracts sync
-   --from /path/to/export` setup command in the template root. Runtime MCP remains
-   read-only; it does not export, download or silently invent contracts.
-5. Configure the MCP client to launch this package's `bin/pagestudio-mcp.js`, with
-   PAGESTUDIO_PROJECT_ROOT set to the template root. The package can live elsewhere.
-   Project-local `.pagestudio/contracts` is the default. Set
-   PAGESTUDIO_BLOCK_CONTRACTS_DIR only to intentionally select another verified bundle.
-6. Have the developer start the project's existing `npm run start` workflow once.
-   Reuse that owner; do not start competing Grunt/Webpack/build/watch commands.
-7. Enable the MCP server/tools in the client and perform discovery plus a readiness
-   call before accepting the setup. Readiness must identify the intended canonical
-   projectRoot and cover assets when the requested change affects assets.
+The actual package executables are `pagestudio` and `pagestudio-mcp`. Codex CLI is
+not required. Node **>=20** is required by the CLI/runtime dependencies; use a
+currently supported Node release. This kit adds onboarding, not a new builder or
+agent executor. Inspect the template's package scripts, site/build configuration,
+source conventions and asset inputs before changing its development workflow.
 
-The examples under `resources/agent-workflow` are shipped with the npm package.
-They are mergeable examples, not an installer that changes client preferences.
-Keep contracts, live owner/status files and temporary evidence out of commits
-unless explicitly curating sanitized evidence in a report.
+### Published package
 
-## MCP configuration and discovery
+Use a release that includes `init` and `doctor` (confirm with `--help`; the existing
+`3.0.0-beta1` version string alone does not prove these capabilities). This package
+publishes to **GitHub Packages**, not the public npm registry. Configure your npm
+scope and authenticate to GitHub Packages with your own package-read credentials
+following your organization's process; never commit a token:
 
-For Codex, merge `codex.config.toml.example` into the template's
-`.codex/config.toml` (or adapt it to user configuration), replacing every absolute
-path. Codex documents project configuration as trusted-project only. Do not alter
-trust settings automatically. The example uses supported stdio command, args, cwd
-and env fields. Confirm the configured server with `codex mcp get pagestudio --json`
-or `codex mcp list`; this proves configuration recognition, **not tools usage**.
-See the [official OpenAI MCP documentation](https://developers.openai.com/codex/mcp).
+```sh
+npm config set @pagestudiocms:registry https://npm.pkg.github.com
+npm install --save-dev @pagestudiocms/pagestudio-template-development-server
+npx --no-install pagestudio --help
+```
 
-For VS Code/Copilot, merge `vscode.mcp.json.example` into `.vscode/mcp.json`.
-Only that client example uses `${workspaceFolder}`. Do not copy its interpolation
-syntax into Codex TOML. Other clients must use their own documented stdio schema.
-A VS Code MCP entry alone does not configure a different agent client.
+Run these commands in the template root after installing:
 
-Place the copied AGENTS.md at the adopting template root and start the agent from
-that project. Codex documents reading repository guidance at session startup;
-restart a session after adding instructions and ask it to identify its instruction
-sources. See the [official OpenAI AGENTS.md documentation](https://developers.openai.com/codex/guides/agents-md).
+```sh
+npx --no-install pagestudio init --agent codex --dry-run
+npx --no-install pagestudio init --agent codex
+npx --no-install pagestudio contracts sync --from "/absolute/path/to/verified-cms-export"
+npx --no-install pagestudio doctor
+# Reuse a running dev owner. If none is running, start the existing project workflow once:
+npm run start
+```
+
+`--no-install` prevents npx from fetching a different package when the local bin is
+missing. The installer does not add or replace `start`/asset scripts. For a new
+project, configure its sources and existing one-shot asset pipeline using the
+[dev lifecycle guide](../dev-build-readiness.md); an npm packaging build is not
+necessarily an appropriate asset builder.
+
+### Local development checkout
+
+Install dependencies in the development-server checkout, then link it from the
+adopting template. Use absolute paths and quote paths containing spaces:
+
+```sh
+cd "/absolute/path/to/development-server"
+npm ci
+cd "/absolute/path/to/template"
+npm install --save-dev "/absolute/path/to/development-server"
+npx --no-install pagestudio init --agent codex --dry-run
+npx --no-install pagestudio init --agent codex
+```
+
+Alternatively, without installing into the template, run the checkout's CLI
+explicitly (after `npm ci` in that checkout):
+
+```sh
+node "/absolute/path/to/development-server/bin/pagestudio.js" init --agent codex --project-root "/absolute/path/to/template"
+node "/absolute/path/to/development-server/bin/pagestudio.js" contracts sync --from "/absolute/path/to/verified-cms-export" --project-root "/absolute/path/to/template"
+node "/absolute/path/to/development-server/bin/pagestudio.js" doctor --project-root "/absolute/path/to/template"
+```
+
+### What initialization changes
+
+- Root selection: explicit `--project-root`, then `PAGESTUDIO_PROJECT_ROOT`, otherwise
+  the nearest ancestor containing `package.json` or `.git`; an empty directory uses
+  the current directory. Roots are canonicalized. Nested commands therefore target
+  the nearest package/repository; use the explicit flag for monorepos.
+- `AGENTS.md`: append one marked block from the shipped
+  `resources/agent-workflow/AGENTS.md`, retaining all project text. Keep project rules
+  outside the markers. An unchanged rerun writes nothing. Edited/outdated/malformed
+  managed blocks require manual reconciliation against the shipped resource.
+- `.codex/config.toml`: use the current absolute Node executable, this package's
+  absolute MCP script, and the canonical template root as both cwd and
+  `PAGESTUDIO_PROJECT_ROOT`. Preserve existing settings, comments, other servers and
+  custom PageStudio fields. Fill missing fields in simple explicit PageStudio tables.
+  Complete equivalent entries (including a resolvable `command = "node"`) are retained.
+  Conflicts, invalid TOML, symlinks and representations that cannot safely be extended
+  stop initialization before either file is changed. Partial inline/quoted/dotted
+  representations may need manual conversion to explicit tables. Review the error
+  and the shipped example; rerun `--dry-run` after resolving it.
+
+Dry-run prints the proposed full file contents and creates nothing. Review locally:
+existing config may contain private settings. Init does not alter project trust,
+global Codex preferences, scripts, contracts, generated assets, `.gitignore` or
+report files. No Codex skill installation is necessary; shared guidance remains in
+`resources/agent-workflow`, while project-specific instructions stay in the template.
+
+The generated TOML is machine-local. Keep it out of shared commits where possible;
+if your project already tracks config, review its local-path handling explicitly.
+Commit `AGENTS.md` and use the shipped
+`resources/agent-workflow/codex.config.toml.example` as a safe tracked placeholder
+example. After moving a checkout, changing Node or reinstalling the package, review
+conflicting paths manually and rerun init. No `${workspaceFolder}` interpolation is
+used in Codex TOML. That interpolation belongs only to the separate
+`resources/agent-workflow/vscode.mcp.json.example` for VS Code/Copilot; a Copilot
+entry does not configure the Codex extension.
+
+## Doctor and native Codex invocation
+
+`pagestudio doctor [--project-root <directory>] [--config <existing-dev-config>]
+[--json]` is read-only except for launching and closing its own diagnostic stdio MCP
+process. It never installs packages, starts a dev owner, builds assets, syncs
+contracts or changes trust. Its Node/dependency check covers declared package
+resolution; the protocol probe additionally exercises the MCP runtime imports.
+It deliberately validates the PageStudio entry against the Node/package installation
+running doctor, avoiding execution of arbitrary project-configured commands.
+
+| Check | Meaning and fix |
+| --- | --- |
+| PASS | The named local check succeeded; it is not blanket adoption or visual approval. |
+| WARN | Nonblocking local condition: missing/stopped/dead owner, an owner still building, transient status publication, contract override, or HTML-only asset scope. Reuse/start the existing workflow and rerun when ready. |
+| FAIL | Blocking setup/readiness problem: unsupported Node, missing dependency/config/executable, conflicting roots/tools, missing/invalid contracts, stale/invalid/failed owner or mismatched scope, invalid dev config, failed MCP protocol/tool discovery. Resolve the specific message. |
+| NOT_VERIFIED | Evidence unavailable: live Codex config loading, native invocation, browser appearance, or an owner scope/protocol check prevented by another failure. |
+
+Exit status is **1 if any check FAILs**, otherwise **0**. Exit 0 can include WARN
+and NOT_VERIFIED; a stopped owner is an expected setup state, never a ready build.
+The report includes canonical root, configured asset inputs, and live
+session/generation when available. `--config` should match the existing start script;
+CLI overrides/custom watch scopes still need source inspection because status does
+not publish the full owner configuration. HTML-only readiness cannot verify an
+asset change. Manifest/schema validity cannot independently prove CMS provenance.
+Obtain the real CMS `tools:blocks:export` output and use the existing
+`contracts sync --from` command; do not create fixtures to make doctor pass.
+
+Doctor initializes stdio, lists the three required tools and calls build status
+with a bounded timeout. It labels this as a **diagnostic protocol probe**. It does
+not claim the VS Code session loaded config, read AGENTS.md, or invoked native tools.
+
+After init, reload the VS Code window and start a **new Codex session in the template
+project**. Project-local configuration is loaded for trusted projects only; the
+developer manages that trust decision. Ask Codex to identify its instruction sources,
+then use Codex's connected-tools picker/discovery to find the tools below. Ask it to
+invoke build status directly, retrieve an applicable CMS block contract, and validate
+each affected project-relative layout. Record actual native calls; a shell command,
+SDK probe or a successful doctor report is not native tool-picker evidence. No
+`codex mcp` command or Codex CLI installation is needed.
+
+Configuration fields and project scope were checked against the
+[official OpenAI MCP documentation](https://developers.openai.com/codex/mcp) and
+[configuration precedence/trust documentation](https://developers.openai.com/codex/config-basic).
 
 Use the connected client's tool-discovery/list-tools facility and verify the actual
 names (prefixes may vary):
@@ -182,3 +276,15 @@ reported validated after the SCSS edit; this follow-up alone does not
 demonstrate a whole-affected-layout validation batch.
 
 See the separate [Gourmet follow-up report](https://github.com/pagestudiocms/gourmet-template/blob/feat/agent-hero-verification/docs/agent-hero-evidence/README.md).
+
+## Reusable kit implementation and second-template evidence (issue #15)
+
+See [design/audit decisions](kit-design.md) and the
+[second-template adoption report](second-template-adoption.md) for actual automated
+observations and outstanding native VS Code checks. The new kit has 30 targeted
+checks for merges, reruns, paths, dry-run, conflicts, dependency/config/contract
+failures, owner readiness and real stdio behavior. The full suite passes **139
+checks with none pending**, including the verified 17-block local CMS export.
+The disposable independent template accepted both affected layouts in one ready
+session at generation 3 after advancing from generation 1. This is diagnostic SDK
+evidence; native VS Code invocation remains a manual gap.
