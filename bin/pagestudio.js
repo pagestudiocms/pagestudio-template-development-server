@@ -104,6 +104,20 @@ program
   });
 
 // Contract bundle management (local CMS export source).
+program.command('init')
+  .description('Merge reusable PageStudio guidance and project-local Codex MCP configuration')
+  .requiredOption('--agent <agent>', 'Agent client (codex)')
+  .option('--project-root <directory>', 'Target project (otherwise detect nearest package.json/.git from cwd)')
+  .option('--dry-run', 'Preview complete changes without writing files')
+  .action(options => require('../src/commands/init').run(options));
+
+program.command('doctor')
+  .description('Diagnose local Codex, contracts, read-only MCP protocol and dev-owner readiness')
+  .option('--project-root <directory>', 'Target project (otherwise detect nearest package.json/.git from cwd)')
+  .option('--config <path>', 'Existing dev configuration to inspect (default: site.config.json)')
+  .option('--json', 'Print a structured diagnostic report')
+  .action(options => require('../src/commands/doctor').run(options));
+
 const contracts = program.command('contracts').description('Manage project-local CMS block contracts');
 contracts.command('sync')
   .description('Copy and validate an exported CMS contract bundle into .pagestudio/contracts')

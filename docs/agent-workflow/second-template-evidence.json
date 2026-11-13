@@ -1,0 +1,545 @@
+{
+  "date": "2026-11-13T06:09:02.037Z",
+  "repository": "independent disposable non-Gourmet template Git repository",
+  "platform": "linux",
+  "node": "v21.0.0",
+  "transport": "diagnostic SDK stdio (not native Codex)",
+  "nativeCodexVSCode": "NOT_VERIFIED: exercise has no native VS Code session",
+  "browserAppearance": "NOT_CHECKED",
+  "exportManifestSha256": "d6a8fbd524bc3fdc38d4cc520c68817685e442d17a5cf1593cf69ceb90a18ce2",
+  "initialRepositoryClean": true,
+  "initialOwner": {
+    "schemaVersion": "1.0",
+    "available": true,
+    "ready": true,
+    "state": "ready",
+    "projectRoot": "<template-root>",
+    "sessionId": "f053cfa9-dd28-4d8c-ad3d-605a3a7de354",
+    "pid": 522273,
+    "startedAt": "2026-11-13T06:09:02.299Z",
+    "heartbeatAt": "2026-11-13T06:09:03.138Z",
+    "generation": 1,
+    "activeGeneration": null,
+    "pendingChanges": {
+      "count": 0,
+      "files": []
+    },
+    "phase": null,
+    "lastSuccessfulBuild": {
+      "generation": 1,
+      "completedAt": "2026-11-13T06:09:03.138Z"
+    },
+    "failure": null,
+    "preview": {
+      "state": "listening",
+      "port": 38233,
+      "host": "127.0.0.1"
+    },
+    "assetBuild": "npm:build-assets",
+    "limitations": [
+      "Readiness covers observed watched inputs and successful command exits, not visual correctness.",
+      "Check sessionId and generation again after validation; source files are not locked.",
+      "Heartbeat freshness is bounded to 10 seconds; process start identity is additionally checked where /proc is available."
+    ]
+  },
+  "preview": "Preview Codex project: <template-root>\nCREATE AGENTS.md\n<!-- pagestudio:agent-workflow:start -->\n# PageStudio template development\n\nUse this repository's existing design system, CMS conventions and asset pipeline.\nBefore editing HTML, SCSS or JS, inspect package scripts, build/configuration files,\napplicable template/data/partial files, imported styles and nearby components.\nResolve source/output paths from this project; do not assume a Gourmet layout.\nPreserve unrelated work. Keep the requested change bounded.\n\nDiscover these tools from the configured PageStudio MCP server (client prefixes\nmay differ):\n\n- pagestudio_get_block_contract({name})\n- pagestudio_get_build_status({})\n- pagestudio_validate_template({file})\n\nRetrieve each applicable CMS block contract and rendered fixture before editing.\nPreserve its supported structure/classes and distinguish sample markup from all\npossible CMS output. Missing/invalid contracts are a coverage gap: report the\nmissing block/bundle, arrange a validated export, and avoid inventing CMS rules.\n\nUse the existing running dev owner. Do not start competing npm/Grunt/Webpack/watch\nprocesses, run builds from MCP, or treat old compiled assets as current. When no\ndev owner is available, report it and use the developer's setup/start workflow;\nresume verification once the intended owner is running. Check projectRoot and\nassetBuild scope; HTML-only readiness cannot attest an asset change.\n\nAfter the source change, follow this verification protocol for ALL affected\nHTML templates, including layouts consuming changed partials/styles:\n\n1. Call pagestudio_get_build_status. Wait for available=true, ready=true,\n   state=ready in the intended project. Idle/building means wait and recheck;\n   unavailable/stale/stopped is NOT success. Retry a transient updating publication\n   briefly; persistent unavailable status needs developer setup. On failed, inspect the dev terminal,\n   fix actionable source errors and wait again. Configuration changes need restart.\n2. Record sessionId and generation. Call pagestudio_validate_template for each\n   affected project-relative HTML file. Inspect valid, findings AND limitations.\n   Fix actionable errors/risks in source, then restart this protocol after rebuild.\n3. Read build status AGAIN. Accept results only when available and ready are\n   still true, projectRoot and sessionId match, and generation is unchanged for\n   the entire validation batch. A changed session/generation invalidates ALL\n   findings in that batch; wait and repeat every affected template.\n4. Classify warnings individually: fix unintended risks, explain intentional\n   overrides with evidence, and explicitly retain unresolved risks/coverage gaps.\n   Do not suppress warnings merely to obtain a clean report. Unmatched selectors\n   and missing fixture ancestors are not proof of invalid CSS.\n5. Report affected files, contracts, tools/transport actually used, build\n   sessionId/generation before and after, each validation result, fixes, retained\n   findings and limitations. State whether browser appearance was actually checked.\n\nIf MCP is absent/disconnected or tools are missing, diagnose configuration,\nproject root, package version and client tool enablement. Report verification as\nblocked/unverified until connected; local compilation or direct validator imports\nare not a substitute for an MCP run. A diagnostic stdio client may demonstrate\nprotocol behavior when native client discovery is unavailable, but label that\ntransport and leave native-agent discovery unverified.\n\nStatic MCP results do NOT prove visual correctness, browser responsive behavior,\naccessibility conformance, complete CMS rendering or tenant compatibility. Never\nclaim those checks unless actually performed. Keep browser verification separate\nfrom build and static validation in the final report.\n<!-- pagestudio:agent-workflow:end -->\n\nCREATE .codex/config.toml\n\n[mcp_servers.pagestudio]\ncommand = \"<node>\"\nargs = [\"<development-server>/bin/pagestudio-mcp.js\"]\ncwd = \"<template-root>\"\nstartup_timeout_sec = 20\ntool_timeout_sec = 120\n\n[mcp_servers.pagestudio.env]\nPAGESTUDIO_PROJECT_ROOT = \"<template-root>\"\n\nLocal Codex config uses absolute Node/package/project paths; rerun init after moving/reinstalling and review conflicts. Keep it local; use the shipped example for tracking.\nRun pagestudio contracts sync --from \"/absolute/path/to/verified-cms-export\", then pagestudio doctor. Reuse the project dev owner, or start the existing npm run start once.\nReload the VS Code window and start a new Codex session in this project. Project config requires developer-managed trust. Invoke pagestudio_get_build_status from the native Codex tools, then retrieve a block contract and validate an affected layout. Doctor cannot verify native invocation or visual appearance.\n",
+  "init": "Initialized Codex project: <template-root>\nCREATE AGENTS.md\nCREATE .codex/config.toml\nLocal Codex config uses absolute Node/package/project paths; rerun init after moving/reinstalling and review conflicts. Keep it local; use the shipped example for tracking.\nRun pagestudio contracts sync --from \"/absolute/path/to/verified-cms-export\", then pagestudio doctor. Reuse the project dev owner, or start the existing npm run start once.\nReload the VS Code window and start a new Codex session in this project. Project config requires developer-managed trust. Invoke pagestudio_get_build_status from the native Codex tools, then retrieve a block contract and validate an affected layout. Doctor cannot verify native invocation or visual appearance.\n",
+  "idempotent": true,
+  "contractSync": "Synced 17 CMS block contracts to <template-root>/.pagestudio/contracts\n",
+  "doctor": {
+    "projectRoot": "<template-root>",
+    "checks": [
+      {
+        "name": "Node",
+        "status": "PASS",
+        "message": "Node 21.0.0; requires >=20 (Commander/open runtime minimum). Install a supported Node release >=20 if needed."
+      },
+      {
+        "name": "Dependencies",
+        "status": "PASS",
+        "message": "All declared package runtime dependencies resolve. No packages were installed."
+      },
+      {
+        "name": "Project root",
+        "status": "PASS",
+        "message": "<template-root>"
+      },
+      {
+        "name": "Codex configuration",
+        "status": "PASS",
+        "message": "Project-local TOML and enabled PageStudio stdio entry are valid; unrelated settings preserved."
+      },
+      {
+        "name": "MCP executable",
+        "status": "PASS",
+        "message": "<node> <development-server>/bin/pagestudio-mcp.js (cwd <template-root>)"
+      },
+      {
+        "name": "Live Codex configuration",
+        "status": "NOT_VERIFIED",
+        "message": "Local TOML validity does not prove this VS Code session loaded it. Reload VS Code, open a new Codex session in the intended trusted project; manage trust yourself."
+      },
+      {
+        "name": "CMS contracts",
+        "status": "PASS",
+        "message": "17 validated enabled block fixtures in <template-root>/.pagestudio/contracts. Schema validity does not establish export provenance."
+      },
+      {
+        "name": "Dev configuration",
+        "status": "PASS",
+        "message": "<template-root>/site.config.json; layouts <template-root>/views/pages; assets npm:build-assets; asset inputs <template-root>/theme. Check these paths against the project source conventions."
+      },
+      {
+        "name": "Dev owner",
+        "status": "PASS",
+        "message": "ready; projectRoot <template-root>; session f053cfa9-dd28-4d8c-ad3d-605a3a7de354; generation 1. Recheck the same session/generation after all affected layouts are validated."
+      },
+      {
+        "name": "Owner project / asset scope",
+        "status": "PASS",
+        "message": "npm:build-assets; expected npm:build-assets. Readiness covers configured watched inputs; inspect assetWatch for all affected asset sources."
+      },
+      {
+        "name": "MCP protocol / tools",
+        "status": "PASS",
+        "message": "Read-only stdio initialize, tools/list and build-status call succeeded; pagestudio_get_block_contract, pagestudio_get_build_status, pagestudio_validate_template. This diagnostic probe is not a native Codex invocation."
+      },
+      {
+        "name": "Native Codex invocation",
+        "status": "NOT_VERIFIED",
+        "message": "In the VS Code Codex tool picker, discover all three PageStudio tools and directly invoke build status, a real block contract, and validation for each affected layout. Record the calls; no Codex CLI is required."
+      },
+      {
+        "name": "Browser appearance",
+        "status": "NOT_VERIFIED",
+        "message": "Static diagnostics and build readiness do not verify rendered appearance."
+      }
+    ],
+    "exitCode": 0
+  },
+  "tools": [
+    "pagestudio_get_block_contract",
+    "pagestudio_validate_template",
+    "pagestudio_get_build_status"
+  ],
+  "contract": {
+    "schemaVersion": "1.0",
+    "renderer": "cms-built-in",
+    "name": "button",
+    "contract": {
+      "config": {
+        "name": "button",
+        "type": "button",
+        "group": "components",
+        "order": 1,
+        "label": "Button",
+        "assets": {
+          "css": [],
+          "js": []
+        }
+      },
+      "hasSampleData": true,
+      "hasBuiltinRenderer": true,
+      "renderer": {
+        "type": "custom",
+        "class": "Button_Portlet"
+      },
+      "fixtureStatus": "rendered"
+    },
+    "fixture": {
+      "input": {
+        "fixture-button-0": {
+          "portlet_id": "fixture-button-0",
+          "sortable_id": "bootstrap-builder-container",
+          "content": "<a class=\"btn btn-default btn-md\">Button text</a>",
+          "portlet_type": "button",
+          "portlet_method": "portlet_modal",
+          "portlet_object": "Button",
+          "style": {
+            "background-color": "",
+            "margin-top": "",
+            "margin-right": "",
+            "margin-bottom": "",
+            "margin-left": "",
+            "padding-top": "",
+            "padding-right": "",
+            "padding-bottom": "",
+            "padding-left": "",
+            "border-top-width": "",
+            "border-right-width": "",
+            "border-bottom-width": "",
+            "border-left-width": "",
+            "border-style": "",
+            "border-color": ""
+          },
+          "attr": {
+            "class": ""
+          },
+          "button_text": "Button text",
+          "button_type": "default",
+          "button_link_flag": "no",
+          "button_link_page": "",
+          "button_link_text": "",
+          "button_size": "md",
+          "button_alignment": "left",
+          "button_icon_flag": "no",
+          "button_icon": "",
+          "button_icon_alignment": "left",
+          "button_full_width_flag": "no"
+        }
+      },
+      "html": "<div class=\"text-left \" > \n<a class=\"btn btn-default btn-md\">Button text</a>\n</div> \n"
+    }
+  },
+  "before": {
+    "schemaVersion": "1.0",
+    "available": true,
+    "ready": true,
+    "state": "ready",
+    "projectRoot": "<template-root>",
+    "sessionId": "f053cfa9-dd28-4d8c-ad3d-605a3a7de354",
+    "pid": 522273,
+    "startedAt": "2026-11-13T06:09:02.299Z",
+    "heartbeatAt": "2026-11-13T06:09:04.623Z",
+    "generation": 3,
+    "activeGeneration": null,
+    "pendingChanges": {
+      "count": 0,
+      "files": []
+    },
+    "phase": null,
+    "lastSuccessfulBuild": {
+      "generation": 3,
+      "completedAt": "2026-11-13T06:09:04.623Z"
+    },
+    "failure": null,
+    "preview": {
+      "state": "listening",
+      "port": 38233,
+      "host": "127.0.0.1"
+    },
+    "assetBuild": "npm:build-assets",
+    "limitations": [
+      "Readiness covers observed watched inputs and successful command exits, not visual correctness.",
+      "Check sessionId and generation again after validation; source files are not locked.",
+      "Heartbeat freshness is bounded to 10 seconds; process start identity is additionally checked where /proc is available."
+    ]
+  },
+  "validation": [
+    {
+      "file": "views/pages/index.html",
+      "result": {
+        "schemaVersion": "1.0",
+        "file": "views/pages/index.html",
+        "valid": true,
+        "findings": [],
+        "analysis": {
+          "stylesheets": [
+            "public/theme.css"
+          ],
+          "sourceStylesheets": [
+            {
+              "file": "theme/main.scss",
+              "syntax": "scss",
+              "constructs": [],
+              "selectors": [
+                {
+                  "selector": ".btn",
+                  "line": 2,
+                  "column": 1,
+                  "status": "authoring-only"
+                }
+              ]
+            }
+          ],
+          "assets": {
+            "mode": "compiled",
+            "expected": [
+              "public/theme.css"
+            ],
+            "artifacts": [
+              {
+                "file": "public/theme.css",
+                "sourceMap": "public/theme.css.map",
+                "freshness": "unknown"
+              }
+            ]
+          },
+          "contracts": [
+            "blank-space",
+            "button",
+            "faq",
+            "form",
+            "gallery",
+            "google-map",
+            "html-code",
+            "icon",
+            "image",
+            "input-text",
+            "pricing-table",
+            "row",
+            "tab",
+            "text-block",
+            "text-heading",
+            "textarea",
+            "video"
+          ],
+          "selectors": [
+            {
+              "file": "public/theme.css",
+              "line": 1,
+              "column": 1,
+              "selector": ".btn",
+              "status": "matched",
+              "matches": [
+                {
+                  "block": "button",
+                  "fixture": "block-button.html",
+                  "count": 1,
+                  "evidence": [
+                    {
+                      "tag": "a",
+                      "attributes": {
+                        "class": "btn btn-default btn-md"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "block": "pricing-table",
+                  "fixture": "block-pricing-table.html",
+                  "count": 1,
+                  "evidence": [
+                    {
+                      "tag": "a",
+                      "attributes": {
+                        "class": "btn btn-default btn-lg"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "media": [],
+              "contexts": [],
+              "declarations": [
+                {
+                  "property": "border-radius",
+                  "value": "0.375rem",
+                  "important": false,
+                  "line": 2,
+                  "column": 3,
+                  "original": {
+                    "file": "theme/main.scss",
+                    "line": 2,
+                    "column": 8
+                  }
+                }
+              ],
+              "original": {
+                "file": "theme/main.scss",
+                "line": 2,
+                "column": 1
+              },
+              "sourceMap": "public/theme.css.map"
+            }
+          ],
+          "mediaQueries": []
+        },
+        "limitations": [
+          "Passing validation does not guarantee CMS compatibility.",
+          "Browser rendering, visual correctness and the complete CSS cascade are not validated.",
+          "The requested HTML source and discovered project stylesheets are checked; stylesheet loading, inline style blocks, linked external assets and HTML includes are not resolved.",
+          "Syntax checks cover CMS Lex if/elseif/else/endif or /if structure, comments and noparse boundaries only.",
+          "Variable/loop data, plugin names/parameters, conditional expressions, PHP, specialty HTML tags and undocumented dialects are not validated.",
+          "Unmatched selectors are observations, not invalid CSS: fixtures are finite HTML fragments.",
+          "Source discovery excludes hidden/dependency/generated directories and symlinks; configured compiled CSS outputs are discovered separately.",
+          "SCSS source is parsed for authoring diagnostics only. Fixture matching, compatibility and responsive analysis use existing compiled or plain CSS; no build is run.",
+          "Pseudo elements and dynamic pseudo classes are unsupported; browser layout and cascade are not validated.",
+          "public/theme.css: CSS freshness is not proven; available input mtimes and source-map snapshots show no detected changes.",
+          "Responsive analysis supports inclusive pixel width/min-width/max-width queries joined by and or comma, with screen/all and optional only.",
+          "Other units, range syntax, negation, non-width features, containers and feature-dependent contexts are unsupported; no browser rendering or visual correctness is inferred.",
+          "Overlap checks compare identical selector text within the same file; stylesheet load order, specificity, shorthand equivalence and final cascade are not resolved."
+        ]
+      }
+    },
+    {
+      "file": "views/pages/contact.html",
+      "result": {
+        "schemaVersion": "1.0",
+        "file": "views/pages/contact.html",
+        "valid": true,
+        "findings": [],
+        "analysis": {
+          "stylesheets": [
+            "public/theme.css"
+          ],
+          "sourceStylesheets": [
+            {
+              "file": "theme/main.scss",
+              "syntax": "scss",
+              "constructs": [],
+              "selectors": [
+                {
+                  "selector": ".btn",
+                  "line": 2,
+                  "column": 1,
+                  "status": "authoring-only"
+                }
+              ]
+            }
+          ],
+          "assets": {
+            "mode": "compiled",
+            "expected": [
+              "public/theme.css"
+            ],
+            "artifacts": [
+              {
+                "file": "public/theme.css",
+                "sourceMap": "public/theme.css.map",
+                "freshness": "unknown"
+              }
+            ]
+          },
+          "contracts": [
+            "blank-space",
+            "button",
+            "faq",
+            "form",
+            "gallery",
+            "google-map",
+            "html-code",
+            "icon",
+            "image",
+            "input-text",
+            "pricing-table",
+            "row",
+            "tab",
+            "text-block",
+            "text-heading",
+            "textarea",
+            "video"
+          ],
+          "selectors": [
+            {
+              "file": "public/theme.css",
+              "line": 1,
+              "column": 1,
+              "selector": ".btn",
+              "status": "matched",
+              "matches": [
+                {
+                  "block": "button",
+                  "fixture": "block-button.html",
+                  "count": 1,
+                  "evidence": [
+                    {
+                      "tag": "a",
+                      "attributes": {
+                        "class": "btn btn-default btn-md"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "block": "pricing-table",
+                  "fixture": "block-pricing-table.html",
+                  "count": 1,
+                  "evidence": [
+                    {
+                      "tag": "a",
+                      "attributes": {
+                        "class": "btn btn-default btn-lg"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "media": [],
+              "contexts": [],
+              "declarations": [
+                {
+                  "property": "border-radius",
+                  "value": "0.375rem",
+                  "important": false,
+                  "line": 2,
+                  "column": 3,
+                  "original": {
+                    "file": "theme/main.scss",
+                    "line": 2,
+                    "column": 8
+                  }
+                }
+              ],
+              "original": {
+                "file": "theme/main.scss",
+                "line": 2,
+                "column": 1
+              },
+              "sourceMap": "public/theme.css.map"
+            }
+          ],
+          "mediaQueries": []
+        },
+        "limitations": [
+          "Passing validation does not guarantee CMS compatibility.",
+          "Browser rendering, visual correctness and the complete CSS cascade are not validated.",
+          "The requested HTML source and discovered project stylesheets are checked; stylesheet loading, inline style blocks, linked external assets and HTML includes are not resolved.",
+          "Syntax checks cover CMS Lex if/elseif/else/endif or /if structure, comments and noparse boundaries only.",
+          "Variable/loop data, plugin names/parameters, conditional expressions, PHP, specialty HTML tags and undocumented dialects are not validated.",
+          "Unmatched selectors are observations, not invalid CSS: fixtures are finite HTML fragments.",
+          "Source discovery excludes hidden/dependency/generated directories and symlinks; configured compiled CSS outputs are discovered separately.",
+          "SCSS source is parsed for authoring diagnostics only. Fixture matching, compatibility and responsive analysis use existing compiled or plain CSS; no build is run.",
+          "Pseudo elements and dynamic pseudo classes are unsupported; browser layout and cascade are not validated.",
+          "public/theme.css: CSS freshness is not proven; available input mtimes and source-map snapshots show no detected changes.",
+          "Responsive analysis supports inclusive pixel width/min-width/max-width queries joined by and or comma, with screen/all and optional only.",
+          "Other units, range syntax, negation, non-width features, containers and feature-dependent contexts are unsupported; no browser rendering or visual correctness is inferred.",
+          "Overlap checks compare identical selector text within the same file; stylesheet load order, specificity, shorthand equivalence and final cascade are not resolved."
+        ]
+      }
+    }
+  ],
+  "after": {
+    "schemaVersion": "1.0",
+    "available": true,
+    "ready": true,
+    "state": "ready",
+    "projectRoot": "<template-root>",
+    "sessionId": "f053cfa9-dd28-4d8c-ad3d-605a3a7de354",
+    "pid": 522273,
+    "startedAt": "2026-11-13T06:09:02.299Z",
+    "heartbeatAt": "2026-11-13T06:09:04.623Z",
+    "generation": 3,
+    "activeGeneration": null,
+    "pendingChanges": {
+      "count": 0,
+      "files": []
+    },
+    "phase": null,
+    "lastSuccessfulBuild": {
+      "generation": 3,
+      "completedAt": "2026-11-13T06:09:04.623Z"
+    },
+    "failure": null,
+    "preview": {
+      "state": "listening",
+      "port": 38233,
+      "host": "127.0.0.1"
+    },
+    "assetBuild": "npm:build-assets",
+    "limitations": [
+      "Readiness covers observed watched inputs and successful command exits, not visual correctness.",
+      "Check sessionId and generation again after validation; source files are not locked.",
+      "Heartbeat freshness is bounded to 10 seconds; process start identity is additionally checked where /proc is available."
+    ]
+  },
+  "batchAccepted": true,
+  "ownerAfterStop": {
+    "schemaVersion": "1.0",
+    "available": false,
+    "ready": false,
+    "state": "unavailable",
+    "reason": "stopped",
+    "lastFailure": null
+  }
+}

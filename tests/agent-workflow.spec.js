@@ -22,6 +22,9 @@ describe('Reusable agent workflow distribution', function () {
       for (const file of ['AGENTS.md', 'codex.config.toml.example', 'vscode.mcp.json.example', 'verification-report.md']) {
         assert.ok(pack.files.some(item => item.path === 'resources/agent-workflow/' + file), file);
       }
+      for (const file of ['bin/pagestudio.js', 'bin/pagestudio-mcp.js', 'src/commands/init.js', 'src/commands/doctor.js', 'src/commands/agent-config.js', 'docs/agent-workflow/README.md', 'docs/agent-workflow/managed-guidance-upgrades.md']) {
+        assert.ok(pack.files.some(item => item.path === file), file);
+      }
       assert.match(fs.readFileSync(path.join(resources, 'verification-report.md'), 'utf8'), /TEMPLATE \(not run evidence\)/);
     } finally { fs.rmSync(cache, { recursive: true, force: true }); }
   });
