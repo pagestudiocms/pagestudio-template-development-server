@@ -63,6 +63,84 @@ describe('Codex template kit initialization', function () {
     write(root, 'AGENTS.md', 'Project rule'); init({ dryRun: true });
     assert.deepEqual(fs.readdirSync(root), ['AGENTS.md']); assert.equal(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8'), 'Project rule');
   });
+  for (const agentsExist of [false, true]) for (const configExists of [false, true]) {
+    it(`rolls back the first ${agentsExist ? 'update' : 'creation'} if the second ${configExists ? 'replacement' : 'creation'} fails`, () => {
+      const agents = Buffer.from('# Local rules\r\nKeep project instructions.\r\n');
+      const config = Buffer.from('# Existing config\r\n[mcp_servers.other]\r\ncommand = "keep"\r\n');
+      const agentsFile = path.join(root, 'AGENTS.md'), configFile = path.join(root, '.codex/config.toml');
+      if (agentsExist) { write(root, 'AGENTS.md', agents); fs.chmodSync(agentsFile, 0o640); }
+      if (configExists) { write(root, '.codex/config.toml', config); fs.chmodSync(configFile, 0o604); }
+      const injected = Object.assign(new Error('Injected second replacement failure'), { code: 'EIO' });
+      const originalRename = fs.renameSync, originalLink = fs.linkSync;
+      let failed = false;
+      const maybeFail = (operation, source, destination, ...args) => {
+        if (source.endsWith('.tmp') && destination === configFile) {
+          assert.match(fs.readFileSync(agentsFile, 'utf8'), /pagestudio:agent-workflow:start/, 'The first operation must already have modified AGENTS.md');
+          failed = true; throw injected;
+        }
+        return operation(source, destination, ...args);
+      };
+      fs.renameSync = (...args) => maybeFail(originalRename, ...args);
+      fs.linkSync = (...args) => maybeFail(originalLink, ...args);
+      const previousUmask = process.umask(0o077);
+      try { assert.throws(() => init(), error => error === injected); }
+      finally { fs.renameSync = originalRename; fs.linkSync = originalLink; process.umask(previousUmask); }
+      assert.equal(failed, true);
+      for (const [file, existed, contents, mode] of [[agentsFile, agentsExist, agents, 0o640], [configFile, configExists, config, 0o604]]) {
+        assert.equal(fs.existsSync(file), existed);
+        if (existed) { assert.deepEqual(fs.readFileSync(file), contents); assert.equal(fs.statSync(file).mode & 0o777, mode); }
+      }
+      assert.ok(!fs.readdirSync(root, { recursive: true }).some(file => file.includes('.pagestudio-init-')), 'No temporary files or backups remain');
+      assert.equal(fs.existsSync(path.join(root, '.codex')), configExists, 'Remove only the empty directory created by this failed attempt');
+      const beforePreview = fs.readdirSync(root, { recursive: true });
+      assert.equal(init({ dryRun: true }).dryRun, true);
+      assert.deepEqual(fs.readdirSync(root, { recursive: true }), beforePreview);
+      init();
+      assert.ok(init().changes.every(item => item.action === 'unchanged'), 'Retry succeeds and remains idempotent');
+    });
+  }
+  it('preserves updated file permissions on success despite a restrictive umask', () => {
+    write(root, 'AGENTS.md', 'Local guidance'); write(root, '.codex/config.toml', '# Local settings\n');
+    fs.chmodSync(path.join(root, 'AGENTS.md'), 0o640); fs.chmodSync(path.join(root, '.codex/config.toml'), 0o604);
+    const previousUmask = process.umask(0o077);
+    try { init(); } finally { process.umask(previousUmask); }
+    assert.equal(fs.statSync(path.join(root, 'AGENTS.md')).mode & 0o777, 0o640);
+    assert.equal(fs.statSync(path.join(root, '.codex/config.toml')).mode & 0o777, 0o604);
+    assert.ok(!fs.readdirSync(root, { recursive: true }).some(file => file.includes('.pagestudio-init-')));
+  });
+  it('cleans up staging and backups without touching originals if preparing the second file fails', () => {
+    write(root, 'AGENTS.md', 'Keep local'); write(root, '.codex/config.toml', '# Keep config\n');
+    const originalWrite = fs.writeFileSync;
+    fs.writeFileSync = (file, ...args) => {
+      if (path.dirname(file) === path.join(root, '.codex') && file.endsWith('.tmp')) throw new Error('Injected second staging failure');
+      return originalWrite(file, ...args);
+    };
+    try { assert.throws(() => init(), /second staging failure/); } finally { fs.writeFileSync = originalWrite; }
+    assert.equal(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8'), 'Keep local');
+    assert.equal(fs.readFileSync(path.join(root, '.codex/config.toml'), 'utf8'), '# Keep config\n');
+    assert.ok(!fs.readdirSync(root, { recursive: true }).some(file => file.includes('.pagestudio-init-')));
+  });
+  it('retains the original backup with recovery instructions if rollback itself is refused', () => {
+    const agentsFile = path.join(root, 'AGENTS.md'), configFile = path.join(root, '.codex/config.toml');
+    write(root, 'AGENTS.md', 'Recover these instructions'); fs.chmodSync(agentsFile, 0o640);
+    write(root, '.codex/config.toml', '# Preserve config\n');
+    const originalRename = fs.renameSync;
+    fs.renameSync = (source, destination, ...args) => {
+      if ((source.endsWith('.tmp') && destination === configFile) || (source.endsWith('.bak') && destination === agentsFile)) throw new Error('Injected filesystem refusal');
+      return originalRename(source, destination, ...args);
+    };
+    let failure;
+    try { assert.throws(() => init(), error => { failure = error; return error instanceof AggregateError; }); }
+    finally { fs.renameSync = originalRename; }
+    const backups = fs.readdirSync(root, { recursive: true }).filter(file => file.includes('.pagestudio-init-'));
+    assert.equal(backups.length, 1); assert.ok(backups[0].endsWith('.bak'));
+    const backup = path.join(root, backups[0]);
+    assert.ok(failure.message.includes(backup)); assert.match(failure.message, /restore it before rerunning init/);
+    assert.equal(fs.readFileSync(backup, 'utf8'), 'Recover these instructions'); assert.equal(fs.statSync(backup).mode & 0o777, 0o640);
+    assert.equal(fs.readFileSync(configFile, 'utf8'), '# Preserve config\n');
+    fs.renameSync(backup, agentsFile); // Exercise the documented manual recovery.
+    init(); assert.ok(init().changes.every(item => item.action === 'unchanged'));
+  });
   for (const [name, config] of [
     ['invalid TOML', '[broken'],
     ['conflicting command', '[mcp_servers.pagestudio]\ncommand = "definitely-not-node"'],
@@ -84,6 +162,19 @@ describe('Codex template kit initialization', function () {
     const original = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8');
     write(root, 'AGENTS.md', original.replace('PageStudio template development', 'My custom workflow'));
     assert.throws(() => init(), /guidance was edited/);
+  });
+  it('leaves unknown-version/customized guidance, outside instructions and Codex config intact', () => {
+    init();
+    const agentsFile = path.join(root, 'AGENTS.md'), configFile = path.join(root, '.codex/config.toml');
+    const customized = '# User instructions before\r\n' + fs.readFileSync(agentsFile, 'utf8').replace('PageStudio template development', 'Earlier or customized workflow') + '\nUser instructions after\n';
+    fs.writeFileSync(agentsFile, customized); fs.chmodSync(agentsFile, 0o640);
+    const config = fs.readFileSync(configFile);
+    for (const dryRun of [true, false]) {
+      assert.throws(() => init({ dryRun }), /guidance was edited or is from another version/);
+      assert.equal(fs.readFileSync(agentsFile, 'utf8'), customized); assert.equal(fs.statSync(agentsFile).mode & 0o777, 0o640);
+      assert.deepEqual(fs.readFileSync(configFile), config);
+    }
+    assert.ok(!fs.readdirSync(root, { recursive: true }).some(file => file.includes('.pagestudio-init-')));
   });
   it('refuses symlinked config directories and guidance', () => {
     const external = fs.mkdtempSync(path.join(os.tmpdir(), 'ps-external-'));

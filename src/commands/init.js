@@ -65,30 +65,68 @@ function initialize(options = {}) {
   const planned = new Map([['AGENTS.md', guidance(originals.get('AGENTS.md'))], ['.codex/config.toml', mergeConfig(originals.get('.codex/config.toml'), root)]]);
   const changes = [...planned].map(([file, content]) => ({ file, action: content === originals.get(file) ? 'unchanged' : fs.existsSync(path.join(root, file)) ? 'update' : 'create', content }));
   if (!options.dryRun) {
-    const stages = [];
+    const stages = [], installed = [], directories = [];
+    let failure;
     try {
-      // Prepare both complete files before replacing either original. A write or
-      // permission failure cannot truncate existing project guidance/config.
+      // Retain the original inode (bytes and permissions) until both replacements
+      // succeed. Staging alone cannot undo a partially applied plan.
       for (const { file, content, action } of changes) {
         if (action === 'unchanged') continue;
         const target = path.join(root, file);
-        fs.mkdirSync(path.dirname(target), { recursive: true });
+        const directory = path.dirname(target);
+        if (!fs.existsSync(directory)) {
+          fs.mkdirSync(directory, { recursive: true });
+          directories.push(directory);
+        }
         readLocal(root, file);
-        const temporary = path.join(path.dirname(target), `.pagestudio-init-${randomUUID()}.tmp`);
-        stages.push({ file, target, temporary, action });
-        const mode = action === 'update' ? fs.statSync(target).mode & 0o777 : 0o600;
+        const prefix = path.join(directory, `.pagestudio-init-${randomUUID()}`);
+        const temporary = prefix + '.tmp', backup = action === 'update' ? prefix + '.bak' : null;
+        const mode = action === 'update' ? fs.statSync(target).mode & 0o7777 : 0o600;
+        stages.push({ file, target, temporary, backup, action, mode });
+        if (backup) fs.linkSync(target, backup);
         fs.writeFileSync(temporary, content, { flag: 'wx', mode });
+        fs.chmodSync(temporary, mode); // Preserve permissions even with a restrictive umask.
       }
       for (const { file, action } of changes) {
         if (readLocal(root, file) !== originals.get(file) || (action === 'create' && fs.existsSync(path.join(root, file)))) throw new Error(`${file} changed during initialization; rerun --dry-run`);
       }
-      for (const { target, temporary, action } of stages) {
+      for (const stage of stages) {
+        const { target, temporary, action } = stage;
         if (action === 'create') fs.linkSync(temporary, target); // Exclusive create.
         else fs.renameSync(temporary, target);
+        installed.push(stage);
       }
+    } catch (error) {
+      failure = error;
+      const recoveryErrors = [];
+      for (const stage of installed.reverse()) {
+        try {
+          if (stage.action === 'create') fs.unlinkSync(stage.target);
+          else fs.renameSync(stage.backup, stage.target);
+        } catch (recoveryError) {
+          // If rollback also fails, retain the original for explicit manual repair.
+          stage.keepBackup = true;
+          recoveryErrors.push(new Error(`Could not restore ${stage.target}.${stage.backup ? ` Original retained at ${stage.backup}; restore it before rerunning init.` : ' Remove the newly created file before rerunning init.'}`, { cause: recoveryError }));
+        }
+      }
+      if (recoveryErrors.length) failure = new AggregateError([error, ...recoveryErrors], `Initialization failed: ${error.message}. ${recoveryErrors.map(item => item.message).join(' ')}`, { cause: error });
     } finally {
-      for (const { temporary } of stages) if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+      const cleanupErrors = [];
+      for (const { temporary, backup, keepBackup } of stages) {
+        for (const file of [temporary, ...(backup && !keepBackup ? [backup] : [])]) {
+          try { fs.unlinkSync(file); }
+          catch (error) { if (error.code !== 'ENOENT') cleanupErrors.push(new Error(`Could not remove initialization artifact ${file}: ${error.message}`, { cause: error })); }
+        }
+      }
+      if (failure) {
+        for (const directory of directories.reverse()) {
+          try { fs.rmdirSync(directory); }
+          catch (error) { if (!['ENOENT', 'ENOTEMPTY', 'EEXIST'].includes(error.code)) cleanupErrors.push(error); }
+        }
+      }
+      if (cleanupErrors.length) failure = new AggregateError([...(failure ? [failure] : []), ...cleanupErrors], [failure?.message, ...cleanupErrors.map(item => item.message)].filter(Boolean).join(' '), { cause: failure });
     }
+    if (failure) throw failure;
   }
   return { projectRoot: root, dryRun: Boolean(options.dryRun), changes };
 }

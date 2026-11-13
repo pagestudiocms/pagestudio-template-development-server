@@ -21,6 +21,12 @@ contract sync/loader tests, dev configuration/status, and all existing
   explicit tables. Refuse conflicts/unsafe representations before writing either
   target file. No project/user-global configuration or trust is read or changed
   outside the two explicit project targets.
+- Retain original file inodes as local recovery copies until both replacements
+  succeed. Roll back completed replacements in reverse order on synchronous
+  failure, preserving bytes and permissions. Clean up staging/backup files and
+  newly created empty directories. If rollback itself fails, retain the original
+  backup and report its exact recovery path. This is not crash recovery or locking
+  against concurrent writers.
 - Resolve Node/package/root once into absolute paths for a reliable VS Code stdio
   launch with spaces in paths, without npx downloads, shell quoting or Codex CLI.
   Local paths are intentionally not portable. Ship the existing placeholder example
@@ -29,6 +35,9 @@ contract sync/loader tests, dev configuration/status, and all existing
   existing resource. Refuse edited/outdated blocks instead of silently replacing
   user customizations. Optional Codex skill installation is omitted: the existing
   generic guidance already expresses the complete protocol without duplicating it.
+  [Version-aware upgrades](managed-guidance-upgrades.md) are proposed as a separate
+  issue because safe baseline retention, legacy migration and customized-block
+  handling add a compatibility mechanism beyond this rollback correction.
 - Doctor reuses contract loading, dev configuration and cross-process status.
   Dependencies are checked by resolution, not installation/execution of arbitrary
   project code. Only the known Node and this installation's MCP script may be

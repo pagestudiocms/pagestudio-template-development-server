@@ -77,6 +77,8 @@ node "/absolute/path/to/development-server/bin/pagestudio.js" doctor --project-r
   `resources/agent-workflow/AGENTS.md`, retaining all project text. Keep project rules
   outside the markers. An unchanged rerun writes nothing. Edited/outdated/malformed
   managed blocks require manual reconciliation against the shipped resource.
+  Automatic version-aware upgrades are deferred; see the
+  [limitation and proposed follow-up issue](managed-guidance-upgrades.md).
 - `.codex/config.toml`: use the current absolute Node executable, this package's
   absolute MCP script, and the canonical template root as both cwd and
   `PAGESTUDIO_PROJECT_ROOT`. Preserve existing settings, comments, other servers and
@@ -86,6 +88,18 @@ node "/absolute/path/to/development-server/bin/pagestudio.js" doctor --project-r
   stop initialization before either file is changed. Partial inline/quoted/dotted
   representations may need manual conversion to explicit tables. Review the error
   and the shipped example; rerun `--dry-run` after resolving it.
+
+Init stages the complete plan and retains original files until both replacements
+succeed. If either replacement fails, it rolls back completed changes, restoring
+original contents and permissions and removing files created by that attempt.
+Successful runs and recovered failures remove staging files and backups; failed
+attempts also remove any newly created empty config directory. If the filesystem
+refuses rollback too, the error identifies the retained original `.bak` file and
+target for manual restoration. Restore that original before rerunning init; a
+failed rollback never silently deletes its recovery copy. Cleanup failures likewise
+report the remaining artifact paths. This handles synchronous filesystem errors;
+it is not a crash/power-loss recovery journal or an atomic snapshot for concurrent
+readers/writers.
 
 Dry-run prints the proposed full file contents and creates nothing. Review locally:
 existing config may contain private settings. Init does not alter project trust,
@@ -281,9 +295,10 @@ See the separate [Gourmet follow-up report](https://github.com/pagestudiocms/gou
 
 See [design/audit decisions](kit-design.md) and the
 [second-template adoption report](second-template-adoption.md) for actual automated
-observations and outstanding native VS Code checks. The new kit has 30 targeted
+observations and outstanding native VS Code checks. The new kit has 38 targeted
 checks for merges, reruns, paths, dry-run, conflicts, dependency/config/contract
-failures, owner readiness and real stdio behavior. The full suite passes **139
+failures, owner readiness, real stdio behavior, rollback and customized guidance
+preservation. The full suite passes **147
 checks with none pending**, including the verified 17-block local CMS export.
 The disposable independent template accepted both affected layouts in one ready
 session at generation 3 after advancing from generation 1. This is diagnostic SDK

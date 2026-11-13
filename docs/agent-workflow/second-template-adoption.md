@@ -75,7 +75,17 @@ into a claim of native discovery, agent obedience or rendered correctness.
 
 ## Package checks
 
-The full suite passes **139 tests with none pending**, including 30 new kit checks
+The initial implementation passed **139 tests with none pending**, including 30 kit checks
 and all 17 real CMS blocks. An actual `npm pack --ignore-scripts` artifact was
 opened and checked for both CLI scripts, all three new command modules, and the
 four reusable workflow resources. `git diff --check` passes.
+
+The PR #16 rollback review subsequently passed **147 tests with none pending**, with
+eight additional checks covering second-operation failures across create/update
+combinations, original permissions under restrictive umask, staging cleanup,
+explicit recovery when rollback fails, and preservation of customized/unknown-version
+guidance. Dry-run, successful retry and idempotent rerun are exercised after recovery.
+The packed artifact still contains the CLI/modules and unchanged shared resources,
+plus the [proposed version-aware upgrade issue](managed-guidance-upgrades.md).
+The diagnostic adoption evidence above was not rerun or relabeled as native
+verification: native Codex VS Code invocation remains **NOT_VERIFIED**.
