@@ -48,6 +48,15 @@ describe('Codex template kit initialization', function () {
     assert.equal(server.tool_timeout_sec, 90); assert.equal(server.env.CUSTOM_FLAG, 'keep');
     assert.ok(init().changes.every(item => item.action === 'unchanged'));
   });
+  it('retains an equivalent Node-on-PATH configuration and existing file permissions', () => {
+    init();
+    const file = path.join(root, '.codex/config.toml');
+    const text = fs.readFileSync(file, 'utf8').replace(JSON.stringify(process.execPath), '"node"');
+    fs.writeFileSync(file, text); fs.chmodSync(file, 0o640);
+    assert.ok(init().changes.every(item => item.action === 'unchanged'));
+    assert.equal(fs.readFileSync(file, 'utf8'), text); assert.equal(fs.statSync(file).mode & 0o777, 0o640);
+    assert.ok(!fs.readdirSync(root).some(name => name.endsWith('.tmp')));
+  });
   it('previews exact content without creating directories or touching existing files', () => {
     const result = init({ dryRun: true }); assert.equal(result.dryRun, true);
     assert.ok(result.changes[1].content.includes(root)); assert.deepEqual(fs.readdirSync(root), []);
@@ -173,6 +182,14 @@ describe('Codex template kit doctor', function () {
     initialize({ agent: 'codex', projectRoot: root });
     result = await diagnoseHere({ probe: async () => { throw new Error('Missing MCP tool'); } });
     assert.equal(check(result, 'MCP protocol').status, 'FAIL'); assert.match(check(result, 'MCP protocol').message, /Missing MCP tool/);
+  });
+  it('honors an explicit verified contract override and checks a selected dev config', async () => {
+    fs.renameSync(path.join(root, '.pagestudio/contracts'), path.join(root, 'verified-export'));
+    const file = path.join(root, '.codex/config.toml');
+    fs.appendFileSync(file, `PAGESTUDIO_BLOCK_CONTRACTS_DIR = ${JSON.stringify(path.join(root, 'verified-export'))}\n`);
+    let result = await diagnoseHere(); assert.equal(check(result, 'CMS contracts').status, 'PASS'); assert.equal(check(result, 'Contract override').status, 'WARN');
+    result = await diagnose({ projectRoot: root, config: 'missing-site.json' }, { probe: async () => {} });
+    assert.equal(result.exitCode, 1); assert.equal(check(result, 'Dev configuration').status, 'FAIL');
   });
   it('probes the actual stdio protocol/tools and exits nonzero for blocking CLI failures', async () => {
     const result = await diagnose({ projectRoot: root }); assert.equal(result.exitCode, 0); assert.equal(check(result, 'MCP protocol').status, 'PASS');

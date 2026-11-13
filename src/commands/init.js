@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { randomUUID } = require('node:crypto');
 const { isDeepStrictEqual } = require('node:util');
 const { packageRoot, projectRoot, readLocal, parseConfig, expectedServer, checkServer } = require('./agent-config');
 const START = '<!-- pagestudio:agent-workflow:start -->';
@@ -64,12 +65,29 @@ function initialize(options = {}) {
   const planned = new Map([['AGENTS.md', guidance(originals.get('AGENTS.md'))], ['.codex/config.toml', mergeConfig(originals.get('.codex/config.toml'), root)]]);
   const changes = [...planned].map(([file, content]) => ({ file, action: content === originals.get(file) ? 'unchanged' : fs.existsSync(path.join(root, file)) ? 'update' : 'create', content }));
   if (!options.dryRun) {
-    for (const { file } of changes) if (readLocal(root, file) !== originals.get(file)) throw new Error(`${file} changed during initialization; rerun --dry-run`);
-    for (const { file, content, action } of changes) {
-      if (action === 'unchanged') continue;
-      const target = path.join(root, file);
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.writeFileSync(target, content, { flag: action === 'create' ? 'wx' : 'w', mode: 0o600 });
+    const stages = [];
+    try {
+      // Prepare both complete files before replacing either original. A write or
+      // permission failure cannot truncate existing project guidance/config.
+      for (const { file, content, action } of changes) {
+        if (action === 'unchanged') continue;
+        const target = path.join(root, file);
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        readLocal(root, file);
+        const temporary = path.join(path.dirname(target), `.pagestudio-init-${randomUUID()}.tmp`);
+        stages.push({ file, target, temporary, action });
+        const mode = action === 'update' ? fs.statSync(target).mode & 0o777 : 0o600;
+        fs.writeFileSync(temporary, content, { flag: 'wx', mode });
+      }
+      for (const { file, action } of changes) {
+        if (readLocal(root, file) !== originals.get(file) || (action === 'create' && fs.existsSync(path.join(root, file)))) throw new Error(`${file} changed during initialization; rerun --dry-run`);
+      }
+      for (const { target, temporary, action } of stages) {
+        if (action === 'create') fs.linkSync(temporary, target); // Exclusive create.
+        else fs.renameSync(temporary, target);
+      }
+    } finally {
+      for (const { temporary } of stages) if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
     }
   }
   return { projectRoot: root, dryRun: Boolean(options.dryRun), changes };
